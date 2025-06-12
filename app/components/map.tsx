@@ -1,4 +1,4 @@
-import { MapContainer, Polyline, TileLayer, Pane } from "react-leaflet";
+import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Track } from "~/types";
 import { FogOfWar } from "./fog-of-war";
@@ -12,10 +12,9 @@ const Map = ({ tracks }: MapProps) => {
 
   return (
     <MapContainer center={position} zoom={13} className="h-screen w-full">
-      <Pane name="fogPane" style={{ zIndex: 450 }} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
 
       {tracks.map((track, trackIndex) => (

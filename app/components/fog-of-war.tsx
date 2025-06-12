@@ -1,4 +1,4 @@
-import { useMap } from "react-leaflet";
+import { Pane, useMap } from "react-leaflet";
 import * as d3 from "d3";
 import L from "leaflet";
 import { useEffect } from "react";
@@ -67,7 +67,7 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
         .attr("y", fogY)
         .attr("width", fogWidth)
         .attr("height", fogHeight)
-        .attr("fill", "rgba(0,0,0,0.6)")
+        .attr("fill", "rgba(0,0,0,0.8)")
         .attr("mask", "url(#fog-mask)");
     };
 
@@ -81,5 +81,5 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
     };
   }, [map, tracks]);
 
-  return null;
+  return <Pane name="fogPane" style={{ zIndex: 450, filter: "blur(10px)" }} />;
 };
