@@ -28,8 +28,9 @@ export default function Home() {
           <DialogHeader>
             <DialogTitle>Please select your .fit files</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
+              Some useless description which won't be read by anyone. It is
+              needed just to make the app appear more complex than it actually
+              is.
             </DialogDescription>
           </DialogHeader>
           <div>
