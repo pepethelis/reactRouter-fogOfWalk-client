@@ -4,7 +4,7 @@ import L from "leaflet";
 import { useEffect } from "react";
 import type { Track } from "~/types";
 
-const buffer = 1000;
+const buffer = 2000;
 
 export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
   const map = useMap();
@@ -68,6 +68,7 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
         .attr("width", fogWidth)
         .attr("height", fogHeight)
         .attr("fill", "rgba(0,0,0,0.8)")
+        .attr("filter", "blur(10px)")
         .attr("mask", "url(#fog-mask)");
     };
 
