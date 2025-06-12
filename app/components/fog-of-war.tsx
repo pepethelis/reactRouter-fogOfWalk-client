@@ -4,11 +4,13 @@ import L from "leaflet";
 import { useEffect } from "react";
 import type { Track } from "~/types";
 
+const buffer = 1000;
+
 export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
   const map = useMap();
 
   useEffect(() => {
-    const svg = L.svg({ pane: "fogPane" }).addTo(map);
+    const svg = L.svg({ pane: "fogPane", padding: buffer }).addTo(map);
     const container = d3.select(map.getPanes().fogPane).select("svg");
 
     const renderFog = () => {
@@ -16,15 +18,24 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
 
       const bounds = map.getBounds();
       const topLeft = map.latLngToLayerPoint(bounds.getNorthWest());
+      const bottomRight = map.latLngToLayerPoint(bounds.getSouthEast());
+
+      const width = bottomRight.x - topLeft.x;
+      const height = bottomRight.y - topLeft.y;
+
+      const fogX = topLeft.x - buffer;
+      const fogY = topLeft.y - buffer;
+      const fogWidth = width + 2 * buffer;
+      const fogHeight = height + 2 * buffer;
 
       container
         .append("mask")
         .attr("id", "fog-mask")
         .append("rect")
-        .attr("x", topLeft.x)
-        .attr("y", topLeft.y)
-        .attr("width", "100%")
-        .attr("height", "100%")
+        .attr("x", fogX)
+        .attr("y", fogY)
+        .attr("width", fogWidth)
+        .attr("height", fogHeight)
         .attr("fill", "white");
 
       tracks.forEach((track) => {
@@ -52,10 +63,10 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
 
       container
         .append("rect")
-        .attr("x", topLeft.x)
-        .attr("y", topLeft.y)
-        .attr("width", "100%")
-        .attr("height", "100%")
+        .attr("x", fogX)
+        .attr("y", fogY)
+        .attr("width", fogWidth)
+        .attr("height", fogHeight)
         .attr("fill", "rgba(0,0,0,0.6)")
         .attr("mask", "url(#fog-mask)");
     };
