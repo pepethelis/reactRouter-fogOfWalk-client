@@ -1,16 +1,18 @@
-import { MapContainer, Polyline, TileLayer } from "react-leaflet";
+import { MapContainer, Polyline, TileLayer, Pane } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Track } from "~/types";
+import { FogOfWar } from "./fog-of-war";
 
 export type MapProps = {
   tracks: Array<Track>;
 };
 
 const Map = ({ tracks }: MapProps) => {
-  const position = { lat: 42.438917, lng: -71.116146 };
+  const position = { lat: 50.45, lng: 30.5233 };
 
   return (
     <MapContainer center={position} zoom={13} className="h-screen w-full">
+      <Pane name="fogPane" style={{ zIndex: 450 }} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -29,6 +31,8 @@ const Map = ({ tracks }: MapProps) => {
           }}
         />
       ))}
+
+      <FogOfWar tracks={tracks} />
     </MapContainer>
   );
 };
