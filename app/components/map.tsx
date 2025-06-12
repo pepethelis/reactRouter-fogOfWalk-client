@@ -57,7 +57,11 @@ const Map = ({ tracks }: MapProps) => {
   const position = { lat: 50.45, lng: 30.5233 };
 
   return (
-    <MapContainer center={position} zoom={13} className="h-screen w-full">
+    <MapContainer
+      center={position}
+      zoom={13}
+      className="relative h-screen w-full z-0"
+    >
       <TileLayer
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"

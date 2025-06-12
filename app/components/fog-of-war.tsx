@@ -81,5 +81,5 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
     };
   }, [map, tracks]);
 
-  return <Pane name="fogPane" style={{ zIndex: 450, filter: "blur(10px)" }} />;
+  return <Pane name="fogPane" style={{ filter: "blur(10px)" }} />;
 };
