@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import DynamicMap from "~/components/dynamic-map";
+import { Button } from "~/components/ui/button"; // Import Button
 import {
   Dialog,
   DialogContent,
@@ -20,9 +21,44 @@ export function meta() {
 
 export default function Home() {
   const [parsedTracks, setParsedTracks] = useState<Track[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      try {
+        console.log(`Processing ${target.files.length} FIT files...`);
+        const newTracks = await parseFitFiles(target.files);
+        console.log(`Successfully parsed ${newTracks.length} tracks`);
+
+        setParsedTracks(newTracks);
+
+        console.log({ tracks: newTracks });
+      } catch (error) {
+        console.error("Error parsing FIT files:", error);
+      } finally {
+        target.value = "";
+      }
+    }
+  };
+
+  const handleSelectFilesClick = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <>
+      <Input
+        type="file"
+        multiple
+        accept=".fit"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
       <Dialog open={parsedTracks.length === 0}>
         <DialogContent className="z-50" showCloseButton={false}>
           <DialogHeader>
@@ -33,37 +69,24 @@ export default function Home() {
               is.
             </DialogDescription>
           </DialogHeader>
-          <div>
-            <div className="grid w-full max-w-sm items-center gap-3">
-              <Input
-                type="file"
-                multiple
-                accept=".fit"
-                onChange={async (event) => {
-                  const target = event.target as HTMLInputElement;
-                  if (target.files && target.files.length > 0) {
-                    try {
-                      console.log(
-                        `Processing ${target.files.length} FIT files...`
-                      );
-                      const tracks = await parseFitFiles(target.files);
-                      console.log(
-                        `Successfully parsed ${tracks.length} tracks`
-                      );
-
-                      setParsedTracks(tracks);
-                      console.log({ tracks });
-                    } catch (error) {
-                      console.error("Error parsing FIT files:", error);
-                    }
-                  }
-                }}
-              />
-            </div>
+          <div className="pt-4">
+            <Button onClick={handleSelectFilesClick} className="w-full">
+              Select Files
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
-      <div className="relative">
+
+      <div className="relative h-screen w-screen">
+        {parsedTracks.length > 0 && (
+          <Button
+            variant="secondary"
+            onClick={handleSelectFilesClick}
+            className="absolute top-4 right-4 z-10"
+          >
+            Select other files
+          </Button>
+        )}
         <DynamicMap tracks={parsedTracks} />
       </div>
     </>
