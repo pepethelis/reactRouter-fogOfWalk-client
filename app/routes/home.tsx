@@ -13,8 +13,8 @@ import { parseFitFiles } from "~/utils/fit";
 
 export function meta() {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Fog of Walk" },
+    { name: "description", content: "Multiple fit/gpx files vizualizer" },
   ];
 }
 
