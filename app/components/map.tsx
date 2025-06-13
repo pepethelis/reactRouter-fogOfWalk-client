@@ -18,23 +18,28 @@ const metersToPixels = (meters: number, zoom: number, latitude: number) => {
   return Math.min(meters / metersPerPixel, 20); // Limit to 20 meters equivalent
 };
 
+const defaultPolylineWeight = 8;
+
 const DynamicPolyline = ({ track, index }: { track: Track; index: number }) => {
   const map = useMap();
-  const [weight, setWeight] = useState(8);
+  const [weight, setWeight] = useState(defaultPolylineWeight);
 
   useEffect(() => {
     const updateWeight = () => {
       const zoom = map.getZoom();
       const center = map.getCenter();
-      const pixelWeight = metersToPixels(20, zoom, center.lat); // 20 meters
+      const pixelWeight = Math.min(
+        metersToPixels(20, zoom, center.lat),
+        defaultPolylineWeight
+      ); // 20 meters
       setWeight(pixelWeight);
     };
 
-    updateWeight(); // Initial calculation
-    map.on("zoomend moveend", updateWeight); // Update on zoom or move
+    updateWeight();
+    map.on("zoomend moveend", updateWeight);
 
     return () => {
-      map.off("zoomend moveend", updateWeight); // Cleanup listeners
+      map.off("zoomend moveend", updateWeight);
     };
   }, [map]);
 
