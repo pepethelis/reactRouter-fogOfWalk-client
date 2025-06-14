@@ -84,7 +84,6 @@ export const FogOfWar = ({ tracks }: { tracks: Array<Track> }) => {
         .attr("width", fogWidth)
         .attr("height", fogHeight)
         .attr("fill", "rgba(0,0,0,0.8)")
-        .attr("filter", "blur(10px)")
         .attr("mask", "url(#fog-mask)");
     };
 
