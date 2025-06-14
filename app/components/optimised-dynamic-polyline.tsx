@@ -1,16 +1,16 @@
 import React, { useMemo } from "react";
 import { Polyline } from "react-leaflet";
-import type { Track } from "~/types";
+import type { Segment } from "~/types";
 
 interface OptimizedDynamicPolylineProps {
-  track: Track;
+  segment: Segment;
   index: number;
   visiblePointIndices: Set<number>;
 }
 
 export const OptimizedDynamicPolyline: React.FC<
   OptimizedDynamicPolylineProps
-> = ({ track, index, visiblePointIndices }) => {
+> = ({ segment, index, visiblePointIndices }) => {
   const optimizedPositions = useMemo(() => {
     if (visiblePointIndices.size === 0) {
       return [];
@@ -25,19 +25,19 @@ export const OptimizedDynamicPolyline: React.FC<
     // Add some context points before and after visible range for smooth lines
     const minIndex = Math.max(0, Math.min(...visibleIndices) - 5);
     const maxIndex = Math.min(
-      track.points.length - 1,
+      segment.length - 1,
       Math.max(...visibleIndices) + 5
     );
 
     for (let i = minIndex; i <= maxIndex; i++) {
-      const point = track.points[i];
+      const point = segment[i];
       if (point) {
         positions.push(point);
       }
     }
 
     return positions;
-  }, [track.points, visiblePointIndices]);
+  }, [segment, visiblePointIndices]);
 
   if (optimizedPositions.length < 2) {
     return null;

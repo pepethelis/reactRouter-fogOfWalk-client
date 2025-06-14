@@ -57,17 +57,20 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
       <MapUpdater tracks={tracks} />
 
       {distanceFilteredTracks.map((track, trackIndex) => {
-        const visiblePointIndices = visiblePoints.get(trackIndex) || new Set();
-        if (visiblePointIndices.size === 0) return null;
+        return track.segments.map((segment, segmentIndex) => {
+          const visiblePointIndices =
+            visiblePoints.get(trackIndex) || new Set();
+          if (visiblePointIndices.size === 0) return null;
 
-        return (
-          <OptimizedDynamicPolyline
-            key={trackIndex}
-            track={track}
-            index={trackIndex}
-            visiblePointIndices={visiblePointIndices}
-          />
-        );
+          return (
+            <OptimizedDynamicPolyline
+              key={`${trackIndex}-${segmentIndex}`}
+              segment={segment}
+              index={trackIndex}
+              visiblePointIndices={visiblePointIndices}
+            />
+          );
+        });
       })}
 
       <Fog
@@ -96,7 +99,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
         <br />
         Rendered points:{" "}
         {distanceFilteredTracks.reduce(
-          (sum, track) => sum + track.points.length,
+          (sum, track) => sum + track.segments.length,
           0
         )}
       </div>

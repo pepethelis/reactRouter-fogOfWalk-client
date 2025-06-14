@@ -14,25 +14,27 @@ export const useTileManager = (tracks: Track[]) => {
     tileCache.clear();
 
     tracks.forEach((track, trackIndex) => {
-      track.points.forEach((point, pointIndex) => {
-        for (let zoom = 1; zoom <= 18; zoom++) {
-          const tile = TileSystem.latLngToTile(point[0], point[1], zoom);
-          const tileKey = TileSystem.tileToKey(tile);
+      track.segments.forEach((segment, segmentIndex) => {
+        segment.forEach((point, pointIndex) => {
+          for (let zoom = 1; zoom <= 18; zoom++) {
+            const tile = TileSystem.latLngToTile(point[0], point[1], zoom);
+            const tileKey = TileSystem.tileToKey(tile);
 
-          if (!tileCache.has(tileKey)) {
-            tileCache.set(tileKey, {
-              key: tile,
-              points: [],
+            if (!tileCache.has(tileKey)) {
+              tileCache.set(tileKey, {
+                key: tile,
+                points: [],
+              });
+            }
+
+            tileCache.get(tileKey)!.points.push({
+              lat: point[0],
+              lng: point[1],
+              trackIndex,
+              pointIndex,
             });
           }
-
-          tileCache.get(tileKey)!.points.push({
-            lat: point[0],
-            lng: point[1],
-            trackIndex,
-            pointIndex,
-          });
-        }
+        });
       });
     });
 

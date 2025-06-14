@@ -10,7 +10,7 @@ export function useTracksFitBounds(tracks: Array<Track>, map: Map) {
 
     const bounds: [number, number][] = [];
     tracks.forEach((track) => {
-      track.points.forEach((point) => {
+      track.segments.forEach((point) => {
         bounds.push([point[0], point[1]]);
       });
     });

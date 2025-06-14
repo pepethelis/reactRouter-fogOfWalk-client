@@ -42,7 +42,7 @@ async function parseSingleGpxFile(
         time: new Date(gpx.metadata?.time),
         source: gpx.$?.creator,
         filename: file.name,
-        points,
+        segments: [points],
       });
     }
   }

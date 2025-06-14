@@ -6,7 +6,7 @@ export const calculateCenter = (tracks: Array<Track>) => {
   let pointCount = 0;
 
   tracks.forEach((track) => {
-    track.points.forEach((point) => {
+    track.segments.forEach((point) => {
       totalLat += point[0];
       totalLng += point[1];
       pointCount++;
