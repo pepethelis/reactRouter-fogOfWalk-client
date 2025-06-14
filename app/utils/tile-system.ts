@@ -10,7 +10,6 @@ export interface TileData {
     lat: number;
     lng: number;
     trackIndex: number;
-    segmentIndex: number;
     pointIndex: number;
   }>;
 }

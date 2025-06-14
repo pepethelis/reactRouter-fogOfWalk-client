@@ -1,6 +1,4 @@
-export type Point = [number, number];
-
-export type Segment = Array<Point>;
+import type { Point } from "./point";
 
 export type Track = {
   filename?: string;
@@ -8,5 +6,5 @@ export type Track = {
   type?: string;
   source?: string;
   time?: Date;
-  segments: Array<Segment>;
+  points: Point[];
 };

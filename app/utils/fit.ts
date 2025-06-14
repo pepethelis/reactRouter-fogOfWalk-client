@@ -157,7 +157,7 @@ async function parseSingleFitFile(file: File): Promise<Track | null> {
           type: trackType,
           source: trackSource,
           time: trackTime,
-          segments: [points],
+          points: points,
         };
 
         resolve(track);
@@ -192,21 +192,19 @@ export function getTrackBounds(track: Track): {
   minLon: number;
   maxLon: number;
 } | null {
-  if (track.segments.length === 0) return null;
+  if (track.points.length === 0) return null;
 
-  let minLon = track.segments[0][0][0];
-  let maxLon = track.segments[0][0][0];
-  let minLat = track.segments[0][0][1];
-  let maxLat = track.segments[0][0][1];
+  let minLon = track.points[0][0];
+  let maxLon = track.points[0][0];
+  let minLat = track.points[0][1];
+  let maxLat = track.points[0][1];
 
-  track.segments.forEach((segment) =>
-    segment.forEach(([lon, lat]) => {
-      minLon = Math.min(minLon, lon);
-      maxLon = Math.max(maxLon, lon);
-      minLat = Math.min(minLat, lat);
-      maxLat = Math.max(maxLat, lat);
-    })
-  );
+  track.points.forEach(([lon, lat]) => {
+    minLon = Math.min(minLon, lon);
+    maxLon = Math.max(maxLon, lon);
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+  });
 
   return { minLat, maxLat, minLon, maxLon };
 }
@@ -215,18 +213,14 @@ export function getTrackBounds(track: Track): {
  * Utility function to calculate track distance in meters
  */
 export function calculateTrackDistance(track: Track): number {
-  if (track.segments.length < 2) {
-    return 0;
-  }
+  if (track.points.length < 2) return 0;
 
   let totalDistance = 0;
 
-  for (const segment of track.segments) {
-    for (let i = 1; i < segment.length; i++) {
-      const [lon1, lat1] = segment[i - 1];
-      const [lon2, lat2] = segment[i];
-      totalDistance += haversineDistance(lat1, lon1, lat2, lon2);
-    }
+  for (let i = 1; i < track.points.length; i++) {
+    const [lon1, lat1] = track.points[i - 1];
+    const [lon2, lat2] = track.points[i];
+    totalDistance += haversineDistance(lat1, lon1, lat2, lon2);
   }
 
   return totalDistance;

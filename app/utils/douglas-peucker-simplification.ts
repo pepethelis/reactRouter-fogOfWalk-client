@@ -1,9 +1,9 @@
 import type { Track } from "~/types";
 
 export const douglasPeucker = (
-  points: Track["segments"],
+  points: Track["points"],
   tolerance: number
-): Track["segments"] => {
+): Track["points"] => {
   if (points.length <= 2) {
     return points;
   }
@@ -56,7 +56,7 @@ export const simplifyTracks = (
 ): Array<Track> => {
   return tracks.map((track) => ({
     ...track,
-    points: douglasPeucker(track.segments, tolerance),
-    originalPointCount: track.segments.length,
+    points: douglasPeucker(track.points, tolerance),
+    originalPointCount: track.points.length,
   }));
 };

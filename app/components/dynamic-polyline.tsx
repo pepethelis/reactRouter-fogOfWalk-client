@@ -1,15 +1,15 @@
 import { Polyline, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
-import type { Segment } from "~/types";
+import type { Track } from "~/types";
 import { metersToPixels } from "~/utils/meters-to-pixels";
 
 const defaultPolylineWeight = 8;
 
 export const DynamicPolyline = ({
-  segment,
+  track,
   index,
 }: {
-  segment: Segment;
+  track: Track;
   index: number;
 }) => {
   const map = useMap();
@@ -37,7 +37,7 @@ export const DynamicPolyline = ({
   return (
     <Polyline
       key={`polyline-${index}`}
-      positions={segment}
+      positions={track.points}
       pathOptions={{
         color: "#ff0f00",
         weight: weight,
