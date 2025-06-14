@@ -54,7 +54,7 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
           return;
         }
 
-        const radiusMeters = 100;
+        const radiusMeters = 250;
         const firstPoint = track.points[0];
         const latlng = new L.LatLng(firstPoint[0], firstPoint[1]);
         const offsetLatLng = L.latLng(firstPoint[0] + 0.001, firstPoint[1]);
