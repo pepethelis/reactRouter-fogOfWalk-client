@@ -93,6 +93,12 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
         Zoom: {currentZoom.toFixed(1)}
         <br />
         Visible tracks: {visiblePoints.size}
+        <br />
+        Rendered points:{" "}
+        {distanceFilteredTracks.reduce(
+          (sum, track) => sum + track.points.length,
+          0
+        )}
       </div>
     </MapContainer>
   );
