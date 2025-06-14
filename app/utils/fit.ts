@@ -1,15 +1,5 @@
 import { Decoder, Stream } from "@garmin/fitsdk";
-
-export type Track = {
-  filename?: string;
-  name?: string;
-  type?: string;
-  source?: string;
-  time?: Date;
-  points: Point[];
-};
-
-export type Point = [number, number]; // [longitude, latitude]
+import type { Point, Track } from "~/types";
 
 interface RecordMessage {
   positionLat?: number;

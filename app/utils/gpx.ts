@@ -32,12 +32,13 @@ function getTracksFromGPXFile(
     return [];
   }
 
-  // Ensure gpx.trk is an array to handle single or multiple tracks
   const tracksInGpx = Array.isArray(gpx.trk) ? gpx.trk : [gpx.trk];
   const parsedTracks: Track[] = [];
 
   for (const trk of tracksInGpx) {
-    if (!trk || !trk.trkseg) continue;
+    if (!trk || !trk.trkseg) {
+      continue;
+    }
 
     const points: Point[] = [];
     // Ensure trk.trkseg is an array for single or multiple segments
