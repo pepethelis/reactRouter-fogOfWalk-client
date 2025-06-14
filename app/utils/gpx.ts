@@ -1,34 +1,15 @@
 import { XMLParser } from "fast-xml-parser";
 import type { Point, Track } from "~/types";
 
-export async function parseGPXFiles(files: string[]): Promise<Track[]> {
-  const parser = new XMLParser({
-    attributesGroupName: "$",
-    attributeNamePrefix: "",
-    ignoreAttributes: false,
-    parseAttributeValue: true,
-  });
-
-  let tracks: Track[] = [];
-  for (const file of files) {
-    const extract = getTracksFromGPXFile(parser, file, file);
-    if (extract.length > 0) {
-      tracks = [...tracks, ...extract];
-    }
-  }
-
-  return tracks;
-}
-
-function getTracksFromGPXFile(
+async function parseSingleGpxFile(
   parser: XMLParser,
-  file: string,
-  filename: string
-): Track[] {
-  const { gpx } = parser.parse(file);
+  file: File
+): Promise<Track[]> {
+  const fileContent = await file.text();
+  const { gpx } = parser.parse(fileContent);
 
   if (!gpx.trk) {
-    console.log("GPX file contains no tracks!", filename);
+    console.log("GPX file contains no tracks!", file.name);
     return [];
   }
 
@@ -60,11 +41,31 @@ function getTracksFromGPXFile(
         type: trk.type,
         time: new Date(gpx.metadata?.time),
         source: gpx.$?.creator,
-        filename,
+        filename: file.name,
         points,
       });
     }
   }
 
   return parsedTracks;
+}
+export async function parseGpxFiles(
+  files: FileList | File[]
+): Promise<Track[]> {
+  const parser = new XMLParser({
+    attributesGroupName: "$",
+    attributeNamePrefix: "",
+    ignoreAttributes: false,
+    parseAttributeValue: true,
+  });
+
+  let tracks: Track[] = [];
+  for (const file of files) {
+    const extractedTracks = await parseSingleGpxFile(parser, file);
+    if (extractedTracks.length > 0) {
+      tracks = [...tracks, ...extractedTracks];
+    }
+  }
+
+  return tracks;
 }
