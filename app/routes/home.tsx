@@ -47,10 +47,10 @@ export default function Home() {
 
   return (
     <>
-      <Input
-        type="file"
+      <input
         multiple
-        accept=".fit,.gpx"
+        type="file"
+        accept=".fit,.gpx,application/gpx+xml,application/octet-stream"
         ref={fileInputRef}
         onChange={handleFileChange}
         className="hidden"
