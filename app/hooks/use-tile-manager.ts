@@ -10,13 +10,11 @@ export const useTileManager = (tracks: Track[]) => {
   const [tileCache] = useState(new Map<string, TileData>());
   const [visibleTiles, setVisibleTiles] = useState<Set<string>>(new Set());
 
-  // Build tile cache from tracks
   const buildTileCache = useMemo(() => {
     tileCache.clear();
 
     tracks.forEach((track, trackIndex) => {
       track.points.forEach((point, pointIndex) => {
-        // Create tiles for multiple zoom levels for better performance
         for (let zoom = 1; zoom <= 18; zoom++) {
           const tile = TileSystem.latLngToTile(point[0], point[1], zoom);
           const tileKey = TileSystem.tileToKey(tile);

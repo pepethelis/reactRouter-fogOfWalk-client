@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { Track } from "~/types";
 import { Fog } from "./fog";
 import { ViewportTracker } from "./viewport-tracker";
@@ -9,6 +9,7 @@ import { useTracksFitBounds } from "~/hooks/use-tracks-fit-bounds";
 import { calculateCenter } from "~/utils/calculate-center";
 import type { ViewportBounds } from "~/utils/tile-system";
 import { OptimizedDynamicPolyline } from "./optimised-dynamic-polyline";
+import { getDistanceFilteredTracks } from "~/utils/distance-track-filtering";
 
 export type MapProps = {
   tracks: Array<Track>;
@@ -21,10 +22,15 @@ const MapUpdater = ({ tracks }: { tracks: Array<Track> }) => {
 };
 
 const TileOptimizedMap = ({ tracks }: MapProps) => {
-  const position = calculateCenter(tracks);
-  const { updateVisibleTiles, getVisiblePoints, visibleTileCount } =
-    useTileManager(tracks);
   const [currentZoom, setCurrentZoom] = useState(13);
+
+  const distanceFilteredTracks = useMemo(
+    () => getDistanceFilteredTracks(tracks, currentZoom),
+    [currentZoom, tracks]
+  );
+  const position = useMemo(() => calculateCenter(tracks), [tracks]);
+  const { updateVisibleTiles, getVisiblePoints, visibleTileCount } =
+    useTileManager(distanceFilteredTracks);
 
   const handleViewportChange = useCallback(
     (bounds: ViewportBounds) => {
@@ -50,7 +56,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
       <ViewportTracker onViewportChange={handleViewportChange} />
       <MapUpdater tracks={tracks} />
 
-      {tracks.map((track, trackIndex) => {
+      {distanceFilteredTracks.map((track, trackIndex) => {
         const visiblePointIndices = visiblePoints.get(trackIndex) || new Set();
         if (visiblePointIndices.size === 0) return null;
 
@@ -65,7 +71,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
       })}
 
       <Fog
-        tracks={tracks}
+        tracks={distanceFilteredTracks}
         visiblePointsMap={visiblePoints}
         currentZoom={currentZoom}
       />

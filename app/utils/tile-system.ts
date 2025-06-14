@@ -23,9 +23,6 @@ export interface ViewportBounds {
 }
 
 export class TileSystem {
-  private static readonly TILE_SIZE = 256;
-
-  // Convert lat/lng to tile coordinates
   static latLngToTile(lat: number, lng: number, zoom: number): TileKey {
     const latRad = (lat * Math.PI) / 180;
     const n = Math.pow(2, zoom);
@@ -36,7 +33,6 @@ export class TileSystem {
     return { x, y, z: zoom };
   }
 
-  // Convert tile coordinates back to lat/lng bounds
   static tileToBounds(tile: TileKey): {
     north: number;
     south: number;
