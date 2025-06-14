@@ -32,7 +32,7 @@ export default function Home() {
         console.log(`Processing ${target.files.length} files...`);
         const newTracks = await parseActivityFiles(target.files);
         console.log(`Successfully parsed ${newTracks.length} tracks`);
-        setParsedTracks(newTracks);
+        setParsedTracks((prevTracks) => [...prevTracks, ...newTracks]);
       } catch (error) {
         console.error("Error parsing files:", error);
       } finally {
@@ -43,6 +43,10 @@ export default function Home() {
 
   const handleSelectFilesClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleClearTracksClick = () => {
+    setParsedTracks([]);
   };
 
   return (
@@ -76,13 +80,14 @@ export default function Home() {
 
       <div className="relative h-screen w-screen">
         {parsedTracks.length > 0 && (
-          <Button
-            variant="secondary"
-            onClick={handleSelectFilesClick}
-            className="absolute top-4 right-4 z-10"
-          >
-            Select other files
-          </Button>
+          <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
+            <Button variant="secondary" onClick={handleSelectFilesClick}>
+              Add other tracks
+            </Button>
+            <Button variant="secondary" onClick={handleClearTracksClick}>
+              Clear tracks
+            </Button>
+          </div>
         )}
         <DynamicMap tracks={parsedTracks} />
       </div>
