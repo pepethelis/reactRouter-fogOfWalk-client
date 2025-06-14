@@ -64,7 +64,10 @@ export async function parseGpxFiles(
     const extractedTracks = await parseSingleGpxFile(parser, file);
     if (extractedTracks.length > 0) {
       tracks = [...tracks, ...extractedTracks];
+      continue;
     }
+
+    console.log("Could not parse", file.name);
   }
 
   return tracks;
