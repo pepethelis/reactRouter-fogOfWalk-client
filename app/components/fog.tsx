@@ -155,5 +155,5 @@ export const Fog = ({
     };
   }, [map, tracks, visiblePointsMap, currentZoom]);
 
-  return <Pane name="fogPane" style={{ filter: "blur(10px)" }} />;
+  return <Pane name="fogPane" />;
 };
