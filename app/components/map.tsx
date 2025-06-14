@@ -66,7 +66,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
 
       <Fog
         tracks={tracks}
-        visiblePoints={visiblePoints}
+        visiblePointsMap={visiblePoints}
         currentZoom={currentZoom}
       />
 

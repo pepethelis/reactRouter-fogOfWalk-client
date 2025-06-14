@@ -8,11 +8,15 @@ const buffer = 2000;
 
 interface FogOfWarProps {
   tracks: Array<Track>;
-  visiblePoints: Map<number, Set<number>>;
+  visiblePointsMap: Map<number, Set<number>>;
   currentZoom: number;
 }
 
-export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
+export const Fog = ({
+  tracks,
+  visiblePointsMap,
+  currentZoom,
+}: FogOfWarProps) => {
   const map = useMap();
 
   useEffect(() => {
@@ -45,7 +49,7 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
 
       // Only process tracks that have visible points
       tracks.forEach((track, trackIndex) => {
-        const trackVisiblePoints = visiblePoints.get(trackIndex);
+        const trackVisiblePoints = visiblePointsMap.get(trackIndex);
         if (
           !trackVisiblePoints ||
           trackVisiblePoints.size === 0 ||
@@ -66,7 +70,6 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
             (radiusMeters / latlng.distanceTo(offsetLatLng))
         );
 
-        // Get visible point indices and add some context
         const visibleIndices = Array.from(trackVisiblePoints).sort(
           (a, b) => a - b
         );
@@ -81,7 +84,7 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
         );
 
         // Create optimized path with only visible + context points
-        const _visiblePoints: Array<{
+        const visiblePoints: Array<{
           lat: number;
           lng: number;
           index: number;
@@ -89,32 +92,13 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
         for (let i = minIndex; i <= maxIndex; i++) {
           const point = track.points[i];
           if (point) {
-            _visiblePoints.push({ lat: point[0], lng: point[1], index: i });
+            visiblePoints.push({ lat: point[0], lng: point[1], index: i });
           }
         }
 
-        if (_visiblePoints.length < 2) return;
+        if (visiblePoints.length < 2) return;
 
-        // Simplify path for performance at lower zoom levels
-        const simplificationFactor = Math.max(
-          1,
-          Math.floor(15 - currentZoom / Math.pow(1.1, currentZoom))
-        );
-        const simplifiedPoints = _visiblePoints.filter(
-          (_, index) => index % simplificationFactor === 0
-        );
-
-        // Ensure we always keep first and last points
-        if (
-          simplifiedPoints.length > 2 &&
-          simplifiedPoints[simplifiedPoints.length - 1] !==
-            _visiblePoints[_visiblePoints.length - 1]
-        ) {
-          simplifiedPoints.push(_visiblePoints[_visiblePoints.length - 1]);
-        }
-
-        // Create path data
-        const pathData = simplifiedPoints
+        const pathData = visiblePoints
           .map((point, index) => {
             const layerPoint = map.latLngToLayerPoint(
               new L.LatLng(point.lat, point.lng)
@@ -123,8 +107,7 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
           })
           .join(" ");
 
-        // Add path stroke to mask
-        if (pathData && simplifiedPoints.length > 1) {
+        if (pathData && visiblePoints.length > 1) {
           mask
             .append("path")
             .attr("d", pathData)
@@ -137,7 +120,7 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
 
         // Add circles at key points (fewer circles at lower zoom)
         const circleStep = Math.max(1, Math.floor(12 - currentZoom));
-        simplifiedPoints.forEach((point, index) => {
+        visiblePoints.forEach((point, index) => {
           if (index % circleStep === 0) {
             const layerPoint = map.latLngToLayerPoint(
               new L.LatLng(point.lat, point.lng)
@@ -170,7 +153,7 @@ export const Fog = ({ tracks, visiblePoints, currentZoom }: FogOfWarProps) => {
       map.off("zoomend moveend", renderFog);
       svg.remove();
     };
-  }, [map, tracks, visiblePoints, currentZoom]);
+  }, [map, tracks, visiblePointsMap, currentZoom]);
 
   return <Pane name="fogPane" style={{ filter: "blur(10px)" }} />;
 };
