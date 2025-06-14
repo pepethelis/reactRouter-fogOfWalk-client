@@ -185,7 +185,11 @@ const lineSegmentsIntersect = (
   return t >= 0 && t <= 1 && u >= 0 && u <= 1;
 };
 
-const isTrackInViewport = (track: Track, bounds: ViewportBounds): boolean => {
+const isTrackInViewport = (
+  track: Track,
+  bounds: ViewportBounds,
+  zoom: number
+): boolean => {
   const trackBounds = getTrackBounds(track);
   if (!boundsIntersect(bounds, trackBounds)) {
     return false;
@@ -203,39 +207,56 @@ const isTrackInViewport = (track: Track, bounds: ViewportBounds): boolean => {
   const points = track.points;
   const pointCount = points.length;
 
-  if (pointCount <= 100) {
-    for (const point of points) {
-      const [lat, lng] = point;
-      if (
-        lat >= bounds.south &&
-        lat <= bounds.north &&
-        lng >= bounds.west &&
-        lng <= bounds.east
-      ) {
-        return true;
-      }
+  const isHighZoom = zoom >= 15;
+  const isMediumZoom = zoom >= 12 && zoom < 15;
+  const isLowZoom = zoom < 12;
+
+  if (isHighZoom) {
+    const trackArea = Math.abs(
+      (trackBounds.east - trackBounds.west) *
+        (trackBounds.north - trackBounds.south)
+    );
+    const pointDensity = pointCount / Math.max(trackArea, 0.000001);
+
+    if (pointDensity < 1000 && pointCount < 20) {
+      return false;
     }
+  }
+
+  let sampleRate: number;
+
+  if (isLowZoom) {
+    sampleRate = Math.max(1, Math.floor(pointCount / 20));
+  } else if (isMediumZoom) {
+    sampleRate = Math.max(1, Math.floor(pointCount / 40));
   } else {
-    const sampleRate = Math.max(1, Math.floor(pointCount / 50));
+    sampleRate =
+      pointCount <= 100 ? 1 : Math.max(1, Math.floor(pointCount / 160));
+  }
 
-    for (let i = 0; i < pointCount; i += sampleRate) {
-      const point = points[i];
-      const [lat, lng] = point;
-      if (
-        lat >= bounds.south &&
-        lat <= bounds.north &&
-        lng >= bounds.west &&
-        lng <= bounds.east
-      ) {
-        return true;
-      }
+  let pointsChecked = 0;
+  for (let i = 0; i < pointCount; i += sampleRate) {
+    const point = points[i];
+    const [lat, lng] = point;
+
+    if (
+      lat >= bounds.south &&
+      lat <= bounds.north &&
+      lng >= bounds.west &&
+      lng <= bounds.east
+    ) {
+      return true;
     }
+    pointsChecked++;
+  }
 
+  if (!isLowZoom) {
     for (let i = 0; i < pointCount - sampleRate; i += sampleRate) {
       const endIndex = Math.min(i + sampleRate, pointCount - 1);
       if (segmentIntersectsViewport(points[i], points[endIndex], bounds)) {
         return true;
       }
+      pointsChecked++;
     }
   }
 
@@ -300,7 +321,11 @@ const calculateBounds = (tracks: Track[]): ViewportBounds => {
   return { north, south, east, west };
 };
 
-const queryIndex = (index: SpatialIndex, viewport: ViewportBounds): Track[] => {
+const queryIndex = (
+  index: SpatialIndex,
+  viewport: ViewportBounds,
+  zoom: number
+): Track[] => {
   if (!boundsIntersect(index.bounds, viewport)) {
     return [];
   }
@@ -308,12 +333,12 @@ const queryIndex = (index: SpatialIndex, viewport: ViewportBounds): Track[] => {
   let result: Track[] = [];
 
   result = result.concat(
-    index.tracks.filter((track) => isTrackInViewport(track, viewport))
+    index.tracks.filter((track) => isTrackInViewport(track, viewport, zoom))
   );
 
   if (index.children) {
     index.children.forEach((child) => {
-      result = result.concat(queryIndex(child, viewport));
+      result = result.concat(queryIndex(child, viewport, zoom));
     });
   }
 
@@ -440,7 +465,7 @@ const Map = ({ tracks, baseSimplificationTolerance = 0.00005 }: MapProps) => {
     let visible: Track[] = [];
     if (spatialIndex) {
       const startTime = performance.now();
-      visible = queryIndex(spatialIndex, bufferedBounds);
+      visible = queryIndex(spatialIndex, bufferedBounds, zoom);
       const endTime = performance.now();
 
       if (process.env.NODE_ENV === "development") {
@@ -450,7 +475,7 @@ const Map = ({ tracks, baseSimplificationTolerance = 0.00005 }: MapProps) => {
       }
     } else {
       visible = tracks.filter((track) =>
-        isTrackInViewport(track, bufferedBounds)
+        isTrackInViewport(track, bufferedBounds, zoom)
       );
     }
 
