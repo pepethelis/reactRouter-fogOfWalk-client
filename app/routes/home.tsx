@@ -10,7 +10,6 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import type { Track } from "~/types";
-import { simplifyTracks } from "~/utils/simplify-tracks";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
 export function meta() {
@@ -32,12 +31,9 @@ export default function Home() {
       try {
         console.log(`Processing ${target.files.length} files...`);
         const newTracks = await parseActivityFiles(target.files);
-        const newTracksSimplified = simplifyTracks(newTracks, 0.00001);
-        console.log(`Successfully parsed ${newTracksSimplified.length} tracks`);
-        setParsedTracks((prevTracks) => [
-          ...prevTracks,
-          ...newTracksSimplified,
-        ]);
+        // const newTracksSimplified = simplifyTracks(newTracks, 0.00001);
+        console.log(`Successfully parsed ${newTracks.length} tracks`);
+        setParsedTracks((prevTracks) => [...prevTracks, ...newTracks]);
       } catch (error) {
         console.error("Error parsing files:", error);
       } finally {
