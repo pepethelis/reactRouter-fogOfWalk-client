@@ -6,17 +6,11 @@ interface OptimizedDynamicPolylineProps {
   track: Track;
   index: number;
   visiblePointIndices: Set<number>;
-  simplificationThreshold?: number;
 }
 
 export const OptimizedDynamicPolyline: React.FC<
   OptimizedDynamicPolylineProps
-> = ({
-  track,
-  index,
-  visiblePointIndices,
-  simplificationThreshold = 0.0001,
-}) => {
+> = ({ track, index, visiblePointIndices }) => {
   const optimizedPositions = useMemo(() => {
     if (visiblePointIndices.size === 0) {
       return [];
@@ -43,7 +37,7 @@ export const OptimizedDynamicPolyline: React.FC<
     }
 
     return positions;
-  }, [track.points, visiblePointIndices, simplificationThreshold]);
+  }, [track.points, visiblePointIndices]);
 
   if (optimizedPositions.length < 2) {
     return null;

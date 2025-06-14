@@ -2,7 +2,7 @@ import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useCallback } from "react";
 import type { Track } from "~/types";
-import { FogOfWar } from "./fog-of-war";
+import { Fog } from "./fog";
 import { ViewportTracker } from "./viewport-tracker";
 import { useTileManager } from "~/hooks/use-tile-manager";
 import { useTracksFitBounds } from "~/hooks/use-tracks-fit-bounds";
@@ -64,7 +64,11 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
         );
       })}
 
-      {/* <FogOfWar tracks={tracks} /> */}
+      <Fog
+        tracks={tracks}
+        visiblePoints={visiblePoints}
+        currentZoom={currentZoom}
+      />
 
       <div
         style={{
