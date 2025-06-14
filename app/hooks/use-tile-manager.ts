@@ -31,6 +31,7 @@ export const useTileManager = (tracks: Track[]) => {
               lat: point[0],
               lng: point[1],
               trackIndex,
+              segmentIndex,
               pointIndex,
             });
           }
