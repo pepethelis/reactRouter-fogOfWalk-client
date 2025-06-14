@@ -1,10 +1,14 @@
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { useState, useCallback } from "react";
 import type { Track } from "~/types";
 import { FogOfWar } from "./fog-of-war";
-import { DynamicPolyline } from "./dynamic-polyline";
+import { ViewportTracker } from "./viewport-tracker";
+import { useTileManager } from "~/hooks/use-tile-manager";
 import { useTracksFitBounds } from "~/hooks/use-tracks-fit-bounds";
 import { calculateCenter } from "~/utils/calculate-center";
+import type { ViewportBounds } from "~/utils/tile-system";
+import { OptimizedDynamicPolyline } from "./optimised-dynamic-polyline";
 
 export type MapProps = {
   tracks: Array<Track>;
@@ -12,14 +16,25 @@ export type MapProps = {
 
 const MapUpdater = ({ tracks }: { tracks: Array<Track> }) => {
   const map = useMap();
-
   useTracksFitBounds(tracks, map);
-
   return null;
 };
 
-const Map = ({ tracks }: MapProps) => {
+const TileOptimizedMap = ({ tracks }: MapProps) => {
   const position = calculateCenter(tracks);
+  const { updateVisibleTiles, getVisiblePoints, visibleTileCount } =
+    useTileManager(tracks);
+  const [currentZoom, setCurrentZoom] = useState(13);
+
+  const handleViewportChange = useCallback(
+    (bounds: ViewportBounds) => {
+      updateVisibleTiles(bounds);
+      setCurrentZoom(bounds.zoom);
+    },
+    [updateVisibleTiles]
+  );
+
+  const visiblePoints = getVisiblePoints(currentZoom);
 
   return (
     <MapContainer
@@ -31,13 +46,46 @@ const Map = ({ tracks }: MapProps) => {
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
+
+      <ViewportTracker onViewportChange={handleViewportChange} />
       <MapUpdater tracks={tracks} />
-      {tracks.map((track, trackIndex) => (
-        <DynamicPolyline key={trackIndex} track={track} index={trackIndex} />
-      ))}
-      <FogOfWar tracks={tracks} />
+
+      {tracks.map((track, trackIndex) => {
+        const visiblePointIndices = visiblePoints.get(trackIndex) || new Set();
+        if (visiblePointIndices.size === 0) return null;
+
+        return (
+          <OptimizedDynamicPolyline
+            key={trackIndex}
+            track={track}
+            index={trackIndex}
+            visiblePointIndices={visiblePointIndices}
+          />
+        );
+      })}
+
+      {/* <FogOfWar tracks={tracks} /> */}
+
+      <div
+        style={{
+          position: "absolute",
+          left: 10,
+          bottom: 10,
+          background: "rgba(255,255,255,0.9)",
+          padding: "10px",
+          borderRadius: "5px",
+          fontSize: "12px",
+          zIndex: 1000,
+        }}
+      >
+        Visible tiles: {visibleTileCount}
+        <br />
+        Zoom: {currentZoom.toFixed(1)}
+        <br />
+        Visible tracks: {visiblePoints.size}
+      </div>
     </MapContainer>
   );
 };
 
-export default Map;
+export default TileOptimizedMap;
