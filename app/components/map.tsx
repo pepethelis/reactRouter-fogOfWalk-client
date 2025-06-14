@@ -1,61 +1,11 @@
-import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Track } from "~/types";
 import { FogOfWar } from "./fog-of-war";
-import { useEffect, useState } from "react";
+import { DynamicPolyline } from "./dynamic-polyline";
 
 export type MapProps = {
   tracks: Array<Track>;
-};
-
-const metersToPixels = (meters: number, zoom: number, latitude: number) => {
-  const earthCircumference = 40075016.686; // Earth's circumference in meters
-  const pixelsPerTile = 256; // Standard tile size in pixels
-  const tiles = Math.pow(2, zoom); // Number of tiles at this zoom level
-  const metersPerPixel =
-    (earthCircumference * Math.cos((latitude * Math.PI) / 180)) /
-    (tiles * pixelsPerTile);
-  return Math.min(meters / metersPerPixel, 20); // Limit to 20 meters equivalent
-};
-
-const defaultPolylineWeight = 8;
-
-const DynamicPolyline = ({ track, index }: { track: Track; index: number }) => {
-  const map = useMap();
-  const [weight, setWeight] = useState(defaultPolylineWeight);
-
-  useEffect(() => {
-    const updateWeight = () => {
-      const zoom = map.getZoom();
-      const center = map.getCenter();
-      const pixelWeight = Math.min(
-        metersToPixels(20, zoom, center.lat),
-        defaultPolylineWeight
-      ); // 20 meters
-      setWeight(pixelWeight);
-    };
-
-    updateWeight();
-    map.on("zoomend moveend", updateWeight);
-
-    return () => {
-      map.off("zoomend moveend", updateWeight);
-    };
-  }, [map]);
-
-  return (
-    <Polyline
-      key={index}
-      positions={track.points}
-      pathOptions={{
-        color: "#ff0f00",
-        weight: weight,
-        opacity: 0.4,
-        lineCap: "round",
-        lineJoin: "round",
-      }}
-    />
-  );
 };
 
 const Map = ({ tracks }: MapProps) => {
