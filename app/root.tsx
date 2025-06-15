@@ -23,6 +23,10 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export function HydrateFallback() {
+  return <p>Loading...</p>;
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
