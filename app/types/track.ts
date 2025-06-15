@@ -1,4 +1,4 @@
-import type { Point } from "./point";
+export type Point = [number, number];
 
 export type Track = {
   filename?: string;
