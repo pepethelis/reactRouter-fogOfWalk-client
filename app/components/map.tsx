@@ -10,6 +10,7 @@ import { calculateCenter } from "~/utils/calculate-center";
 import type { ViewportBounds } from "~/utils/tile-system";
 import { OptimizedDynamicPolyline } from "./optimised-dynamic-polyline";
 import { getDistanceFilteredTracks } from "~/utils/distance-track-filtering";
+import { deduplicateByTilesMap } from "~/utils/track-deduplication";
 
 export type MapProps = {
   tracks: Array<Track>;
@@ -24,13 +25,18 @@ const MapUpdater = ({ tracks }: { tracks: Array<Track> }) => {
 const TileOptimizedMap = ({ tracks }: MapProps) => {
   const [currentZoom, setCurrentZoom] = useState(13);
 
-  const distanceFilteredTracks = useMemo(
-    () => getDistanceFilteredTracks(tracks, currentZoom),
-    [currentZoom, tracks]
-  );
+  const distanceFilteredTracks = useMemo(() => {
+    const filteredTracks = getDistanceFilteredTracks(tracks, currentZoom);
+    return deduplicateByTilesMap(filteredTracks, 50);
+  }, [currentZoom, tracks]);
+
+  const dedupedTracks = useMemo(() => {
+    return deduplicateByTilesMap(distanceFilteredTracks, 70);
+  }, [distanceFilteredTracks]);
+
   const position = useMemo(() => calculateCenter(tracks), [tracks]);
   const { updateVisibleTiles, getVisiblePoints, visibleTileCount } =
-    useTileManager(distanceFilteredTracks);
+    useTileManager(dedupedTracks);
 
   const handleViewportChange = useCallback(
     (bounds: ViewportBounds) => {
@@ -56,7 +62,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
       <ViewportTracker onViewportChange={handleViewportChange} />
       <MapUpdater tracks={tracks} />
 
-      {distanceFilteredTracks.map((track, trackIndex) => {
+      {dedupedTracks.map((track, trackIndex) => {
         const visiblePointIndices = visiblePoints.get(trackIndex) || new Set();
         if (visiblePointIndices.size === 0) return null;
 
@@ -71,7 +77,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
       })}
 
       <Fog
-        tracks={distanceFilteredTracks}
+        tracks={dedupedTracks}
         visiblePointsMap={visiblePoints}
         currentZoom={currentZoom}
       />
@@ -95,10 +101,7 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
         Visible tracks: {visiblePoints.size}
         <br />
         Rendered points:{" "}
-        {distanceFilteredTracks.reduce(
-          (sum, track) => sum + track.points.length,
-          0
-        )}
+        {dedupedTracks.reduce((sum, track) => sum + track.points.length, 0)}
       </div>
     </MapContainer>
   );

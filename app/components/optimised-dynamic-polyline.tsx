@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Polyline } from "react-leaflet";
 import type { Track } from "~/types";
+import { stringToNumberHash } from "~/utils/string-to-number-hash";
 
 interface OptimizedDynamicPolylineProps {
   track: Track;
@@ -47,7 +48,10 @@ export const OptimizedDynamicPolyline: React.FC<
     <Polyline
       positions={optimizedPositions}
       pathOptions={{
-        color: `hsl(${(index * 137.508) % 360}, 70%, 50%)`,
+        color: `hsl(${
+          (stringToNumberHash(track.filename || index.toString()) * 137.508) %
+          360
+        }, 70%, 50%)`,
         weight: 3,
         opacity: 0.8,
       }}

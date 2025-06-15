@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import DynamicMap from "~/components/dynamic-map";
 import { Button } from "~/components/ui/button";
 import {
@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
 import type { Track } from "~/types";
+import { deduplicateByTilesMap } from "~/utils/track-deduplication";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
 export function meta() {
