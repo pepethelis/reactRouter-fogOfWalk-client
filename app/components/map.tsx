@@ -100,8 +100,14 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
         <br />
         Visible tracks: {visiblePoints.size}
         <br />
-        Rendered points:{" "}
+        Deduped points:{" "}
         {dedupedTracks.reduce((sum, track) => sum + track.points.length, 0)}
+        <br />
+        Rendered points:{" "}
+        {[...visiblePoints.values()].reduce(
+          (total, set) => total + set.size,
+          0
+        )}
       </div>
     </MapContainer>
   );
