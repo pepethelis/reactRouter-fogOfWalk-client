@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import type { Track } from "~/types";
-import { deduplicateByTilesMap } from "~/utils/track-deduplication";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
 export function meta() {
@@ -31,7 +30,6 @@ export default function Home() {
       try {
         console.log(`Processing ${target.files.length} files...`);
         const newTracks = await parseActivityFiles(target.files);
-        // const newTracksSimplified = simplifyTracks(newTracks, 0.00001);
         console.log(`Successfully parsed ${newTracks.length} tracks`);
         setParsedTracks((prevTracks) => [...prevTracks, ...newTracks]);
       } catch (error) {
