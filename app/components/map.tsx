@@ -22,7 +22,7 @@ const MapUpdater = ({ tracks }: { tracks: Array<Track> }) => {
   return null;
 };
 
-const TileOptimizedMap = ({ tracks }: MapProps) => {
+const Map = ({ tracks }: MapProps) => {
   const [currentZoom, setCurrentZoom] = useState(13);
 
   const distanceFilteredTracks = useMemo(() => {
@@ -52,7 +52,8 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
     <MapContainer
       center={[position.lat, position.lng]}
       zoom={13}
-      className="relative h-screen w-full z-0"
+      className="relative h-screen w-full"
+      zoomControl={false}
     >
       <TileLayer
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -113,4 +114,4 @@ const TileOptimizedMap = ({ tracks }: MapProps) => {
   );
 };
 
-export default TileOptimizedMap;
+export default Map;

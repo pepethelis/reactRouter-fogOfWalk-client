@@ -1,7 +1,13 @@
-import { useMemo, useRef, useState } from "react";
-import DynamicMap from "~/components/dynamic-map";
+import { useRef, useState } from "react";
+import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { Button } from "~/components/ui/button";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarProvider,
+  SidebarTrigger,
+} from "~/components/ui/sidebar";
 import type { Track } from "~/types";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
@@ -58,19 +64,32 @@ export default function Home() {
         onSelectFilesCLick={handleSelectFilesClick}
       />
 
-      <div className="relative h-screen w-screen">
-        {parsedTracks.length > 0 && (
-          <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
-            <Button variant="secondary" onClick={handleSelectFilesClick}>
-              Add other tracks
-            </Button>
-            <Button variant="secondary" onClick={handleClearTracksClick}>
-              Clear tracks
-            </Button>
-          </div>
-        )}
-        <DynamicMap tracks={parsedTracks} />
-      </div>
+      <SidebarProvider>
+        <div className="relative flex w-full">
+          <Sidebar>
+            <SidebarContent className="p-4">Empty sidebar</SidebarContent>
+          </Sidebar>
+          <main className="relative h-screen flex-grow flex">
+            <div className="z-0 w-full">
+              <Map tracks={parsedTracks} />
+            </div>
+            <SidebarTrigger
+              className="absolute top-4 left-4"
+              variant="secondary"
+            />
+            {parsedTracks.length > 0 && (
+              <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
+                <Button variant="secondary" onClick={handleSelectFilesClick}>
+                  Add other tracks
+                </Button>
+                <Button variant="secondary" onClick={handleClearTracksClick}>
+                  Clear tracks
+                </Button>
+              </div>
+            )}
+          </main>
+        </div>
+      </SidebarProvider>
     </>
   );
 }
