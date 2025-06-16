@@ -1,13 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import DynamicMap from "~/components/dynamic-map";
+import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
 import type { Track } from "~/types";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
@@ -59,23 +53,10 @@ export default function Home() {
         className="hidden"
       />
 
-      <Dialog open={parsedTracks.length === 0}>
-        <DialogContent className="z-50" showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Please select your .fit or .gpx files</DialogTitle>
-            <DialogDescription>
-              Some useless description which won't be read by anyone. It is
-              needed just to make the app appear more complex than it actually
-              is.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="pt-4">
-            <Button onClick={handleSelectFilesClick} className="w-full">
-              Select Files
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SelectFilesDialog
+        isOpen={parsedTracks.length === 0}
+        onSelectFilesCLick={handleSelectFilesClick}
+      />
 
       <div className="relative h-screen w-screen">
         {parsedTracks.length > 0 && (
