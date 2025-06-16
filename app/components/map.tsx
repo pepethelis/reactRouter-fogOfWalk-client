@@ -1,5 +1,4 @@
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { useState, useCallback, useMemo } from "react";
 import type { Track } from "~/types";
 import { Fog } from "./fog";
@@ -11,6 +10,7 @@ import type { ViewportBounds } from "~/utils/tile-system";
 import { OptimizedDynamicPolyline } from "./optimised-dynamic-polyline";
 import { getDistanceFilteredTracks } from "~/utils/distance-track-filtering";
 import { deduplicateByTilesMap } from "~/utils/track-deduplication";
+import "leaflet/dist/leaflet.css";
 
 export type MapProps = {
   tracks: Array<Track>;
