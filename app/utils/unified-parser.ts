@@ -1,6 +1,7 @@
 import type { Track } from "~/types";
 import { parseFitFiles } from "./fit";
 import { parseGpxFiles } from "./gpx";
+import { generateLightId } from "./light-id";
 
 export async function parseActivityFiles(
   files: FileList | File[]
@@ -38,5 +39,5 @@ export async function parseActivityFiles(
     }
   }
 
-  return tracks;
+  return tracks.map((track) => ({ ...track, id: generateLightId(12) }));
 }

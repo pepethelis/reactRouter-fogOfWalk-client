@@ -2,9 +2,9 @@ import type { Map } from "leaflet";
 import { useEffect } from "react";
 import type { Track } from "~/types";
 
-export function useTracksFitBounds(tracks: Array<Track>, map: Map) {
+export function useTracksFitBounds(tracks: Array<Track>, map: Map | null) {
   useEffect(() => {
-    if (tracks.length === 0) {
+    if (tracks.length === 0 || !map) {
       return;
     }
 

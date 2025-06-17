@@ -1,6 +1,7 @@
 export type Point = [number, number];
 
 export type Track = {
+  id?: string;
   filename?: string;
   name?: string;
   type?: string;

@@ -3,15 +3,19 @@ import { Polyline } from "react-leaflet";
 import type { Track } from "~/types";
 import { stringToNumberHash } from "~/utils/string-to-number-hash";
 
-interface OptimizedDynamicPolylineProps {
+interface OptimizedPolylineProps {
   track: Track;
-  index: number;
   visiblePointIndices: Set<number>;
+  muted?: boolean;
+  onClick?: () => void;
 }
 
-export const OptimizedDynamicPolyline: React.FC<
-  OptimizedDynamicPolylineProps
-> = ({ track, index, visiblePointIndices }) => {
+export const OptimizedPolyline: React.FC<OptimizedPolylineProps> = ({
+  track,
+  visiblePointIndices,
+  muted,
+  onClick,
+}) => {
   const optimizedPositions = useMemo(() => {
     if (visiblePointIndices.size === 0) {
       return [];
@@ -46,12 +50,17 @@ export const OptimizedDynamicPolyline: React.FC<
 
   return (
     <Polyline
+      interactive
+      eventHandlers={{
+        click: onClick,
+      }}
       positions={optimizedPositions}
       pathOptions={{
-        color: `hsl(${
-          (stringToNumberHash(track.filename || index.toString()) * 137.508) %
-          360
-        }, 70%, 50%)`,
+        color: muted
+          ? "lightgray"
+          : `hsl(${
+              (stringToNumberHash(track.filename || "") * 137.508) % 360
+            }, 70%, 50%)`,
         weight: 3,
         opacity: 0.8,
       }}
