@@ -1,5 +1,6 @@
 import type { Track } from "~/types";
 import { calculateTrackLengthWithUnits } from "./calculate-track-length";
+import { discoveryRadiusMeters } from "~/lib/constants";
 
 export function calculateTrackDuration(track: Track): number | null {
   const pointsWithTime = track.points.filter((point) => point.time);
@@ -244,12 +245,15 @@ export function calculateDiscoveredArea(
   };
 }
 
-export function getTrackMetrics(track: Track, discoveryRadiusKm: number = 0.1) {
+export function getTrackMetrics(track: Track) {
   const distance = calculateTrackLengthWithUnits(track);
   const duration = calculateTrackDuration(track);
   const speedMetrics = calculateSpeedMetrics(track);
   const asmlMetrics = calculateAsmlMetrics(track);
-  const areaMetrics = calculateDiscoveredArea(track, discoveryRadiusKm);
+  const areaMetrics = calculateDiscoveredArea(
+    track,
+    discoveryRadiusMeters / 1000
+  );
 
   if (!duration) {
     return {

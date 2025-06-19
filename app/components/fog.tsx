@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import L from "leaflet";
 import { useEffect } from "react";
 import type { Track } from "~/types";
+import { discoveryRadiusMeters } from "~/lib/constants";
 
 const buffer = 2000;
 
@@ -58,7 +59,6 @@ export const Fog = ({
           return;
         }
 
-        const radiusMeters = 250;
         const firstPoint = track.points[0];
         const latlng = new L.LatLng(firstPoint.lat, firstPoint.lon);
         const offsetLatLng = L.latLng(firstPoint.lat + 0.001, firstPoint.lon);
@@ -67,7 +67,7 @@ export const Fog = ({
           map
             .latLngToLayerPoint(latlng)
             .distanceTo(map.latLngToLayerPoint(offsetLatLng)) *
-            (radiusMeters / latlng.distanceTo(offsetLatLng))
+            (discoveryRadiusMeters / latlng.distanceTo(offsetLatLng))
         );
 
         const visibleIndices = Array.from(trackVisiblePoints).sort(
