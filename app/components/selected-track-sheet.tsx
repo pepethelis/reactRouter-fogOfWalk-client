@@ -2,6 +2,7 @@ import type { Track } from "~/types";
 import { getTrackMetrics } from "~/utils/calculate-track-metrics";
 import { Sheet, SheetContent, SheetTitle } from "./ui/sheet";
 import { StatsGrid } from "./stats-grid";
+import { ElevationChart } from "./elevation-chart";
 
 type SelectedTrackSheetProps = {
   selectedTrack: Track | null;
@@ -72,8 +73,25 @@ export const SelectedTrackSheet = ({
                     label: "Max speed",
                     value: metrics.formattedMaxSpeed,
                   },
+                  {
+                    label: "Min ASML",
+                    value: metrics.formattedMinAsml,
+                  },
+                  {
+                    label: "Max ASML",
+                    value: metrics.formattedMaxAsml,
+                  },
+                  {
+                    label: "ASML gain",
+                    value: metrics.formattedAsmlGain,
+                  },
+                  {
+                    label: "ASML loss",
+                    value: metrics.formattedAsmlLoss,
+                  },
                 ]}
               />
+              <ElevationChart className="mt-10" track={selectedTrack} />
             </div>
           </>
         )}

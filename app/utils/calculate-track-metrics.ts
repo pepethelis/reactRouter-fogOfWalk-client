@@ -128,6 +128,66 @@ export function calculateSpeedMetrics(track: Track): {
   };
 }
 
+// Calculate asml metrics
+export function calculateAsmlMetrics(track: Track): {
+  minAsml: number | null;
+  maxAsml: number | null;
+  asmlGain: number;
+  asmlLoss: number;
+  formattedMinAsml: string;
+  formattedMaxAsml: string;
+  formattedAsmlGain: string;
+  formattedAsmlLoss: string;
+} {
+  const pointsWithAsml = track.points.filter(
+    (point) => point.asml !== undefined && point.asml !== null
+  );
+
+  if (pointsWithAsml.length === 0) {
+    return {
+      minAsml: null,
+      maxAsml: null,
+      asmlGain: 0,
+      asmlLoss: 0,
+      formattedMinAsml: "unknown",
+      formattedMaxAsml: "unknown",
+      formattedAsmlGain: "0 m",
+      formattedAsmlLoss: "0 m",
+    };
+  }
+
+  const asmls = pointsWithAsml.map((point) => point.asml!);
+  const minAsml = Math.min(...asmls);
+  const maxAsml = Math.max(...asmls);
+
+  let asmlGain = 0;
+  let asmlLoss = 0;
+
+  // Calculate cumulative asml gain and loss
+  for (let i = 1; i < pointsWithAsml.length; i++) {
+    const prevAsml = pointsWithAsml[i - 1].asml!;
+    const currAsml = pointsWithAsml[i].asml!;
+    const diff = currAsml - prevAsml;
+
+    if (diff > 0) {
+      asmlGain += diff;
+    } else {
+      asmlLoss += Math.abs(diff);
+    }
+  }
+
+  return {
+    minAsml,
+    maxAsml,
+    asmlGain,
+    asmlLoss,
+    formattedMinAsml: `${minAsml.toFixed(0)} m`,
+    formattedMaxAsml: `${maxAsml.toFixed(0)} m`,
+    formattedAsmlGain: `${asmlGain.toFixed(0)} m`,
+    formattedAsmlLoss: `${asmlLoss.toFixed(0)} m`,
+  };
+}
+
 // Calculate area covered by circles around track points
 export function calculateDiscoveredArea(
   track: Track,
@@ -188,6 +248,7 @@ export function getTrackMetrics(track: Track, discoveryRadiusKm: number = 0.1) {
   const distance = calculateTrackLengthWithUnits(track);
   const duration = calculateTrackDuration(track);
   const speedMetrics = calculateSpeedMetrics(track);
+  const asmlMetrics = calculateAsmlMetrics(track);
   const areaMetrics = calculateDiscoveredArea(track, discoveryRadiusKm);
 
   if (!duration) {
@@ -201,6 +262,14 @@ export function getTrackMetrics(track: Track, discoveryRadiusKm: number = 0.1) {
       maxSpeed: speedMetrics.maxSpeed,
       formattedAvgSpeed: speedMetrics.formattedAvgSpeed,
       formattedMaxSpeed: speedMetrics.formattedMaxSpeed,
+      minAsml: asmlMetrics.minAsml,
+      maxAsml: asmlMetrics.maxAsml,
+      asmlGain: asmlMetrics.asmlGain,
+      asmlLoss: asmlMetrics.asmlLoss,
+      formattedMinAsml: asmlMetrics.formattedMinAsml,
+      formattedMaxAsml: asmlMetrics.formattedMaxAsml,
+      formattedAsmlGain: asmlMetrics.formattedAsmlGain,
+      formattedAsmlLoss: asmlMetrics.formattedAsmlLoss,
       discoveredArea: areaMetrics.discoveredArea,
       formattedDiscoveredArea: areaMetrics.formattedDiscoveredArea,
     };
@@ -218,6 +287,14 @@ export function getTrackMetrics(track: Track, discoveryRadiusKm: number = 0.1) {
     maxSpeed: speedMetrics.maxSpeed,
     formattedAvgSpeed: speedMetrics.formattedAvgSpeed,
     formattedMaxSpeed: speedMetrics.formattedMaxSpeed,
+    minAsml: asmlMetrics.minAsml,
+    maxAsml: asmlMetrics.maxAsml,
+    asmlGain: asmlMetrics.asmlGain,
+    asmlLoss: asmlMetrics.asmlLoss,
+    formattedMinAsml: asmlMetrics.formattedMinAsml,
+    formattedMaxAsml: asmlMetrics.formattedMaxAsml,
+    formattedAsmlGain: asmlMetrics.formattedAsmlGain,
+    formattedAsmlLoss: asmlMetrics.formattedAsmlLoss,
     discoveredArea: areaMetrics.discoveredArea,
     formattedDiscoveredArea: areaMetrics.formattedDiscoveredArea,
   };
