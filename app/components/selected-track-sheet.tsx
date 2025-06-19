@@ -23,7 +23,7 @@ export const SelectedTrackSheet = ({
         }
       }}
     >
-      <SheetContent className="p-4" side="left">
+      <SheetContent className="p-4" side="left" showOverlay={false}>
         {!!selectedTrack && metrics && (
           <>
             <div>

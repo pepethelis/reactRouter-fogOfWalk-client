@@ -1,9 +1,8 @@
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState } from "react";
 import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
-import { SidebarProvider } from "~/components/ui/sidebar";
 import type { Track } from "~/types";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
