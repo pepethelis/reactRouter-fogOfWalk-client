@@ -84,7 +84,7 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
             muted={!!selectedTrack}
             track={track}
             visiblePointIndices={visiblePointIndices}
-            onClick={() => onTrackClick?.(track)} // TODO: put real track, not optimized
+            onClick={() => onTrackClick?.(track)}
           />
         );
       })}
