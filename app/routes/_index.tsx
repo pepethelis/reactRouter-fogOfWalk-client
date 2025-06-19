@@ -1,17 +1,10 @@
-import { XIcon } from "lucide-react";
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
+import { SelectedTrackSidebar } from "~/components/selected-track-sidebar";
 import { Button } from "~/components/ui/button";
-import { Separator } from "~/components/ui/separator";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarProvider,
-} from "~/components/ui/sidebar";
+import { SidebarProvider } from "~/components/ui/sidebar";
 import type { Track } from "~/types";
-import { calculateTrackLengthWithUnits } from "~/utils/calculate-track-length";
 import { parseActivityFiles } from "~/utils/unified-parser";
 
 export function meta() {
@@ -82,68 +75,10 @@ export default function Home() {
         open={!!selectedTrackId}
       >
         <div className="relative flex w-full">
-          <Sidebar>
-            <SidebarHeader className="flex items-end">
-              <Button
-                aria-label="Close"
-                size="icon"
-                variant="ghost"
-                onClick={() => setSelectedTrackId(null)}
-              >
-                <XIcon />
-              </Button>
-            </SidebarHeader>
-            <SidebarContent className="p-4">
-              {!!selectedTrack && (
-                <>
-                  <div>
-                    <h2 className="text-base">{selectedTrack.filename}</h2>
-                    <p className="text-muted-foreground text-sm">
-                      {selectedTrack.time?.toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}{" "}
-                      at{" "}
-                      {selectedTrack.time?.toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: false,
-                      })}
-                    </p>
-                  </div>
-                  <div className="mt-10 flex h-5 items-center gap-4 justify-around text-sm text-center">
-                    <div className="grid">
-                      <span className="text-muted-foreground text-sm">
-                        Distance
-                      </span>
-                      <span className="text-lg">
-                        {calculateTrackLengthWithUnits(
-                          selectedTrack
-                        ).kilometers.toFixed(2)}
-                        km
-                      </span>
-                    </div>
-                    <Separator orientation="vertical" />
-                    <div className="grid">
-                      <span className="text-muted-foreground text-sm">
-                        Pace
-                      </span>
-                      <span className="text-lg">unknown</span>
-                    </div>
-                    <Separator orientation="vertical" />
-                    <div className="grid">
-                      <span className="text-muted-foreground text-sm">
-                        Time
-                      </span>
-                      <span className="text-lg">unknown</span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </SidebarContent>
-          </Sidebar>
+          <SelectedTrackSidebar
+            selectedTrack={selectedTrack}
+            onClose={() => setSelectedTrackId(null)}
+          />
           <main className="relative h-screen flex-grow flex">
             <div className="z-0 w-full">
               <Map
