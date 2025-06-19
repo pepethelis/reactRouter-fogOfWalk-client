@@ -92,7 +92,10 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
       {!!selectedTrack && (
         <Polyline
           ref={selectedTrackPathRef}
-          positions={selectedTrack.points}
+          positions={selectedTrack.points.map((point) => [
+            point.lat,
+            point.lon,
+          ])}
           className="z-100"
           pathOptions={{
             color: "red",

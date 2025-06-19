@@ -37,10 +37,9 @@ export const OptimizedPolyline: React.FC<OptimizedPolylineProps> = ({
     for (let i = minIndex; i <= maxIndex; i++) {
       const point = track.points[i];
       if (point) {
-        positions.push(point);
+        positions.push([point.lat, point.lon]);
       }
     }
-
     return positions;
   }, [track.points, visiblePointIndices]);
 

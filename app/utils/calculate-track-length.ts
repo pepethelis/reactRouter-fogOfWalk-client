@@ -2,16 +2,14 @@ import type { Point, Track } from "~/types";
 
 function haversineDistance(point1: Point, point2: Point): number {
   const R = 6371000; // Earth's radius in meters
-  const [lat1, lng1] = point1;
-  const [lat2, lng2] = point2;
 
-  const dLat = toRadians(lat2 - lat1);
-  const dLng = toRadians(lng2 - lng1);
+  const dLat = toRadians(point2.lat - point1.lat);
+  const dLng = toRadians(point2.lon - point1.lon);
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
+    Math.cos(toRadians(point1.lat)) *
+      Math.cos(toRadians(point2.lat)) *
       Math.sin(dLng / 2) *
       Math.sin(dLng / 2);
 

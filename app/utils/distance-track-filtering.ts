@@ -43,8 +43,8 @@ const calculatePixelDistance = (
   point2: Point,
   zoom: number
 ): number => {
-  const latLng1 = L.latLng(point1);
-  const latLng2 = L.latLng(point2);
+  const latLng1 = L.latLng(point1.lat, point1.lon);
+  const latLng2 = L.latLng(point2.lat, point2.lon);
 
   const metersPerPixel =
     (156543.03392 * Math.cos((latLng1.lat * Math.PI) / 180)) /

@@ -60,8 +60,8 @@ export const Fog = ({
 
         const radiusMeters = 250;
         const firstPoint = track.points[0];
-        const latlng = new L.LatLng(firstPoint[0], firstPoint[1]);
-        const offsetLatLng = L.latLng(firstPoint[0] + 0.001, firstPoint[1]);
+        const latlng = new L.LatLng(firstPoint.lat, firstPoint.lon);
+        const offsetLatLng = L.latLng(firstPoint.lat + 0.001, firstPoint.lon);
         const radiusPixels = Math.max(
           2,
           map
@@ -92,7 +92,7 @@ export const Fog = ({
         for (let i = minIndex; i <= maxIndex; i++) {
           const point = track.points[i];
           if (point) {
-            visiblePoints.push({ lat: point[0], lng: point[1], index: i });
+            visiblePoints.push({ lat: point.lat, lng: point.lon, index: i });
           }
         }
 

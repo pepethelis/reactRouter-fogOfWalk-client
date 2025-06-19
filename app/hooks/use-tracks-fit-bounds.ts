@@ -11,7 +11,7 @@ export function useTracksFitBounds(tracks: Array<Track>, map: Map | null) {
     const bounds: [number, number][] = [];
     tracks.forEach((track) => {
       track.points.forEach((point) => {
-        bounds.push([point[0], point[1]]);
+        bounds.push([point.lat, point.lon]);
       });
     });
 

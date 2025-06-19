@@ -22,14 +22,23 @@ async function parseSingleGpxFile(
     }
 
     const points: Point[] = [];
+
     // Ensure trk.trkseg is an array for single or multiple segments
     const segments = Array.isArray(trk.trkseg) ? trk.trkseg : [trk.trkseg];
 
     for (const seg of segments) {
       if (seg && seg.trkpt) {
-        for (const trkpt of seg.trkpt) {
+        const trackPoints = Array.isArray(seg.trkpt) ? seg.trkpt : [seg.trkpt];
+
+        for (const trkpt of trackPoints) {
           if (trkpt?.$?.lat && trkpt?.$?.lon) {
-            points.push([parseFloat(trkpt.$.lat), parseFloat(trkpt.$.lon)]);
+            const point: Point = {
+              lat: parseFloat(trkpt.$.lat),
+              lon: parseFloat(trkpt.$.lon),
+              time: trkpt.time ? new Date(trkpt.time) : undefined,
+              asml: trkpt.ele ? parseFloat(trkpt.ele) : undefined,
+            };
+            points.push(point);
           }
         }
       }
@@ -39,7 +48,7 @@ async function parseSingleGpxFile(
       parsedTracks.push({
         name: trk.name,
         type: trk.type,
-        time: new Date(gpx.metadata?.time),
+        time: gpx.metadata?.time ? new Date(gpx.metadata.time) : undefined,
         source: gpx.$?.creator,
         filename: file.name,
         points,
@@ -49,6 +58,7 @@ async function parseSingleGpxFile(
 
   return parsedTracks;
 }
+
 export async function parseGpxFiles(
   files: FileList | File[]
 ): Promise<Track[]> {
@@ -60,13 +70,13 @@ export async function parseGpxFiles(
   });
 
   let tracks: Track[] = [];
+
   for (const file of files) {
     const extractedTracks = await parseSingleGpxFile(parser, file);
     if (extractedTracks.length > 0) {
       tracks = [...tracks, ...extractedTracks];
       continue;
     }
-
     console.log("Could not parse", file.name);
   }
 

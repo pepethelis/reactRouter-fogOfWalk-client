@@ -7,10 +7,10 @@ type TileValue = {
 };
 
 const pointToTileKey = (point: Point, tileSizeMeters: number): string => {
-  const [lat, lng] = point;
+  const { lat, lon } = point;
 
   const latMeters = lat * 111320;
-  const lngMeters = lng * 111320 * Math.cos((lat * Math.PI) / 180);
+  const lngMeters = lon * 111320 * Math.cos((lat * Math.PI) / 180);
 
   const tileLatIndex = Math.floor(latMeters / tileSizeMeters);
   const tileLngIndex = Math.floor(lngMeters / tileSizeMeters);

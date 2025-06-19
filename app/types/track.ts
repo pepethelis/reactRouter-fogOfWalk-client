@@ -1,4 +1,9 @@
-export type Point = [number, number];
+export type Point = {
+  lat: number;
+  lon: number;
+  time?: Date;
+  asml?: number;
+};
 
 export type Track = {
   id?: string;

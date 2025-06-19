@@ -1,4 +1,4 @@
-import type { Track } from "~/types";
+import type { Point, Track } from "~/types";
 
 export const douglasPeucker = (
   points: Track["points"],
@@ -32,13 +32,13 @@ export const douglasPeucker = (
 };
 
 export const perpendicularDistance = (
-  point: number[],
-  lineStart: number[],
-  lineEnd: number[]
+  point: Point,
+  lineStart: Point,
+  lineEnd: Point
 ): number => {
-  const [px, py] = point;
-  const [x1, y1] = lineStart;
-  const [x2, y2] = lineEnd;
+  const { lat: px, lon: py } = point;
+  const { lat: x1, lon: y1 } = lineStart;
+  const { lat: x2, lon: y2 } = lineEnd;
 
   // Calculate the perpendicular distance using the formula:
   // |((y2-y1)*px - (x2-x1)*py + x2*y1 - y2*x1)| / sqrt((y2-y1)^2 + (x2-x1)^2)

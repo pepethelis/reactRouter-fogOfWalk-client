@@ -16,7 +16,7 @@ export const useTileManager = (tracks: Track[]) => {
     tracks.forEach((track, trackIndex) => {
       track.points.forEach((point, pointIndex) => {
         for (let zoom = 1; zoom <= 18; zoom++) {
-          const tile = TileSystem.latLngToTile(point[0], point[1], zoom);
+          const tile = TileSystem.latLngToTile(point.lat, point.lon, zoom);
           const tileKey = TileSystem.tileToKey(tile);
 
           if (!tileCache.has(tileKey)) {
@@ -27,8 +27,8 @@ export const useTileManager = (tracks: Track[]) => {
           }
 
           tileCache.get(tileKey)!.points.push({
-            lat: point[0],
-            lng: point[1],
+            lat: point.lat,
+            lng: point.lon,
             trackIndex,
             pointIndex,
           });

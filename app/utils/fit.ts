@@ -98,7 +98,13 @@ async function parseSingleFitFile(file: File): Promise<Track | null> {
 
               // Validate coordinates are reasonable
               if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-                points.push([lat, lon]);
+                const point: Point = {
+                  lat,
+                  lon,
+                  time: record.timestamp,
+                  asml: record.enhancedAltitude ?? record.altitude,
+                };
+                points.push(point);
               }
             }
           });
@@ -194,16 +200,16 @@ export function getTrackBounds(track: Track): {
 } | null {
   if (track.points.length === 0) return null;
 
-  let minLon = track.points[0][0];
-  let maxLon = track.points[0][0];
-  let minLat = track.points[0][1];
-  let maxLat = track.points[0][1];
+  let minLat = track.points[0].lat;
+  let maxLat = track.points[0].lat;
+  let minLon = track.points[0].lon;
+  let maxLon = track.points[0].lon;
 
-  track.points.forEach(([lon, lat]) => {
-    minLon = Math.min(minLon, lon);
-    maxLon = Math.max(maxLon, lon);
-    minLat = Math.min(minLat, lat);
-    maxLat = Math.max(maxLat, lat);
+  track.points.forEach((point) => {
+    minLat = Math.min(minLat, point.lat);
+    maxLat = Math.max(maxLat, point.lat);
+    minLon = Math.min(minLon, point.lon);
+    maxLon = Math.max(maxLon, point.lon);
   });
 
   return { minLat, maxLat, minLon, maxLon };
@@ -218,9 +224,14 @@ export function calculateTrackDistance(track: Track): number {
   let totalDistance = 0;
 
   for (let i = 1; i < track.points.length; i++) {
-    const [lon1, lat1] = track.points[i - 1];
-    const [lon2, lat2] = track.points[i];
-    totalDistance += haversineDistance(lat1, lon1, lat2, lon2);
+    const point1 = track.points[i - 1];
+    const point2 = track.points[i];
+    totalDistance += haversineDistance(
+      point1.lat,
+      point1.lon,
+      point2.lat,
+      point2.lon
+    );
   }
 
   return totalDistance;
@@ -247,38 +258,3 @@ function haversineDistance(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
-
-/**
- * Get available message types from decoded FIT file (for debugging)
- */
-// export function getMessageTypes(file: File): Promise<string[]> {
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader();
-
-//     reader.onload = () => {
-//       try {
-//         const arrayBuffer = reader.result as ArrayBuffer;
-//         const stream = Stream.fromArrayBuffer(arrayBuffer);
-
-//         if (!Decoder.isFIT(stream)) {
-//           reject(new Error("Not a valid FIT file"));
-//           return;
-//         }
-
-//         const decoder = new Decoder(stream);
-//         const { messages } = decoder.read();
-
-//         const messageTypes = Object.keys(messages).filter(
-//           (key) => Array.isArray(messages[key]) && messages[key].length > 0
-//         );
-
-//         resolve(messageTypes);
-//       } catch (error) {
-//         reject(error);
-//       }
-//     };
-
-//     reader.onerror = () => reject(new Error("Failed to read file"));
-//     reader.readAsArrayBuffer(file);
-//   });
-// }
