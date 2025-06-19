@@ -1,5 +1,5 @@
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import type { Map as MapType } from "leaflet";
 import type { Track } from "~/types";
 import { Fog } from "./fog";
@@ -11,6 +11,7 @@ import type { ViewportBounds } from "~/utils/tile-system";
 import { OptimizedPolyline } from "./optimised-polyline";
 import { getDistanceFilteredTracks } from "~/utils/distance-track-filtering";
 import { deduplicateByTilesMap } from "~/utils/track-deduplication";
+import type { Polyline as PolylineType } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export type MapProps = {
@@ -22,6 +23,7 @@ export type MapProps = {
 const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
   const [currentZoom, setCurrentZoom] = useState(13);
   const mapRef = useRef<MapType>(null);
+  const selectedTrackPathRef = useRef<PolylineType>(null);
 
   useTracksFitBounds(tracks, mapRef.current);
 
@@ -35,6 +37,13 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
   }, [distanceFilteredTracks]);
 
   const position = useMemo(() => calculateCenter(tracks), [tracks]);
+
+  useEffect(() => {
+    if (selectedTrackPathRef.current) {
+      selectedTrackPathRef.current.bringToFront();
+    }
+  }, [selectedTrack]);
+
   const { updateVisibleTiles, getVisiblePoints, visibleTileCount } =
     useTileManager(dedupedTracks);
 
@@ -82,8 +91,9 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
 
       {!!selectedTrack && (
         <Polyline
+          ref={selectedTrackPathRef}
           positions={selectedTrack.points}
-          className="z-10"
+          className="z-100"
           pathOptions={{
             color: "red",
             weight: 3,
