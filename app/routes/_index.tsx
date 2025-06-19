@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
-import { SelectedTrackSidebar } from "~/components/selected-track-sidebar";
+import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
 import { SidebarProvider } from "~/components/ui/sidebar";
 import type { Track } from "~/types";
@@ -66,40 +66,31 @@ export default function Home() {
         onSelectFilesCLick={handleSelectFilesClick}
       />
 
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "24rem",
-          } as CSSProperties
-        }
-        open={!!selectedTrackId}
-      >
-        <div className="relative flex w-full">
-          <SelectedTrackSidebar
-            selectedTrack={selectedTrack}
-            onClose={() => setSelectedTrackId(null)}
-          />
-          <main className="relative h-screen flex-grow flex">
-            <div className="z-0 w-full">
-              <Map
-                tracks={parsedTracks}
-                selectedTrack={selectedTrack}
-                onTrackClick={(track) => setSelectedTrackId(track.id || null)}
-              />
+      <div className="relative flex w-full">
+        <SelectedTrackSheet
+          selectedTrack={selectedTrack}
+          onClose={() => setSelectedTrackId(null)}
+        />
+        <main className="relative h-screen flex-grow flex">
+          <div className="z-0 w-full">
+            <Map
+              tracks={parsedTracks}
+              selectedTrack={selectedTrack}
+              onTrackClick={(track) => setSelectedTrackId(track.id || null)}
+            />
+          </div>
+          {parsedTracks.length > 0 && (
+            <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
+              <Button variant="secondary" onClick={handleSelectFilesClick}>
+                Add other tracks
+              </Button>
+              <Button variant="secondary" onClick={handleClearTracksClick}>
+                Clear tracks
+              </Button>
             </div>
-            {parsedTracks.length > 0 && (
-              <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
-                <Button variant="secondary" onClick={handleSelectFilesClick}>
-                  Add other tracks
-                </Button>
-                <Button variant="secondary" onClick={handleClearTracksClick}>
-                  Clear tracks
-                </Button>
-              </div>
-            )}
-          </main>
-        </div>
-      </SidebarProvider>
+          )}
+        </main>
+      </div>
     </>
   );
 }
