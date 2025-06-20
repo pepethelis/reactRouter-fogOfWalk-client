@@ -20,9 +20,9 @@ type ElevationChartProps = {
 
 const formatDistance = (distance: number): string => {
   if (distance < 1) {
-    return `${Math.round(distance * 1000)}m`;
+    return `${Math.round(distance)}m`;
   }
-  return `${distance.toFixed(1)}km`;
+  return `${(distance / 1000).toFixed(1)}km`;
 };
 
 const formatElevation = (elevation: number): string => {
@@ -114,15 +114,9 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
         <ChartTooltip
           content={
             <ChartTooltipContent
-              labelFormatter={(value) =>
-                `Distance: ${formatDistance(
-                  typeof value === "number" ? value : 0
-                )}`
+              formatter={(value) =>
+                formatElevation(typeof value === "number" ? value : 0)
               }
-              formatter={(value) => [
-                formatElevation(typeof value === "number" ? value : 0),
-                "Elevation",
-              ]}
             />
           }
         />
