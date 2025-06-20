@@ -1,6 +1,7 @@
 import type { Track } from "~/types";
 import { calculateTrackLengthWithUnits } from "./calculate-track-length";
 import { discoveryRadiusMeters } from "~/lib/constants";
+import { removeOutliersAndSmooth } from "./smooth-elevation";
 
 export function calculateTrackDuration(track: Track): number | null {
   const pointsWithTime = track.points.filter((point) => point.time);
@@ -245,11 +246,123 @@ export function calculateDiscoveredArea(
   };
 }
 
+export function calculateSmoothedAsmlMetrics(track: Track): {
+  minAsml: number | null;
+  maxAsml: number | null;
+  asmlGain: number;
+  asmlLoss: number;
+  smoothedMinAsml: number | null;
+  smoothedMaxAsml: number | null;
+  smoothedAsmlGain: number;
+  smoothedAsmlLoss: number;
+  formattedMinAsml: string;
+  formattedMaxAsml: string;
+  formattedAsmlGain: string;
+  formattedAsmlLoss: string;
+  formattedSmoothedMinAsml: string;
+  formattedSmoothedMaxAsml: string;
+  formattedSmoothedAsmlGain: string;
+  formattedSmoothedAsmlLoss: string;
+} {
+  const pointsWithAsml = track.points.filter(
+    (point) => point.asml !== undefined && point.asml !== null
+  );
+
+  if (pointsWithAsml.length === 0) {
+    const unknownResult = {
+      minAsml: null,
+      maxAsml: null,
+      asmlGain: 0,
+      asmlLoss: 0,
+      smoothedMinAsml: null,
+      smoothedMaxAsml: null,
+      smoothedAsmlGain: 0,
+      smoothedAsmlLoss: 0,
+      formattedMinAsml: "unknown",
+      formattedMaxAsml: "unknown",
+      formattedAsmlGain: "0 m",
+      formattedAsmlLoss: "0 m",
+      formattedSmoothedMinAsml: "unknown",
+      formattedSmoothedMaxAsml: "unknown",
+      formattedSmoothedAsmlGain: "0 m",
+      formattedSmoothedAsmlLoss: "0 m",
+    };
+    return unknownResult;
+  }
+
+  const asmls = pointsWithAsml.map((point) => point.asml!);
+
+  // Original elevation metrics
+  const minAsml = Math.min(...asmls);
+  const maxAsml = Math.max(...asmls);
+
+  let asmlGain = 0;
+  let asmlLoss = 0;
+
+  // Calculate cumulative asml gain and loss from original data
+  for (let i = 1; i < pointsWithAsml.length; i++) {
+    const prevAsml = pointsWithAsml[i - 1].asml!;
+    const currAsml = pointsWithAsml[i].asml!;
+    const diff = currAsml - prevAsml;
+
+    if (diff > 0) {
+      asmlGain += diff;
+    } else {
+      asmlLoss += Math.abs(diff);
+    }
+  }
+
+  // Smoothed elevation metrics
+  const smoothedAsmls = removeOutliersAndSmooth(asmls, 30, 5); // Remove outliers up to 30m, then smooth
+
+  const smoothedMinAsml = Math.min(...smoothedAsmls);
+  const smoothedMaxAsml = Math.max(...smoothedAsmls);
+
+  let smoothedAsmlGain = 0;
+  let smoothedAsmlLoss = 0;
+
+  // Calculate cumulative asml gain and loss from smoothed data
+  for (let i = 1; i < smoothedAsmls.length; i++) {
+    const prevAsml = smoothedAsmls[i - 1];
+    const currAsml = smoothedAsmls[i];
+    const diff = currAsml - prevAsml;
+
+    if (diff > 0) {
+      smoothedAsmlGain += diff;
+    } else {
+      smoothedAsmlLoss += Math.abs(diff);
+    }
+  }
+
+  return {
+    // Original metrics
+    minAsml,
+    maxAsml,
+    asmlGain,
+    asmlLoss,
+    formattedMinAsml: `${minAsml.toFixed(0)} m`,
+    formattedMaxAsml: `${maxAsml.toFixed(0)} m`,
+    formattedAsmlGain: `${asmlGain.toFixed(0)} m`,
+    formattedAsmlLoss: `${asmlLoss.toFixed(0)} m`,
+
+    // Smoothed metrics
+    smoothedMinAsml,
+    smoothedMaxAsml,
+    smoothedAsmlGain,
+    smoothedAsmlLoss,
+    formattedSmoothedMinAsml: `${smoothedMinAsml.toFixed(0)} m`,
+    formattedSmoothedMaxAsml: `${smoothedMaxAsml.toFixed(0)} m`,
+    formattedSmoothedAsmlGain: `${smoothedAsmlGain.toFixed(0)} m`,
+    formattedSmoothedAsmlLoss: `${smoothedAsmlLoss.toFixed(0)} m`,
+  };
+}
+
+// Enhanced getTrackMetrics that includes smoothed elevation data
 export function getTrackMetrics(track: Track) {
   const distance = calculateTrackLengthWithUnits(track);
   const duration = calculateTrackDuration(track);
   const speedMetrics = calculateSpeedMetrics(track);
-  const asmlMetrics = calculateAsmlMetrics(track);
+  const asmlMetrics = calculateSmoothedAsmlMetrics(track); // Use enhanced version
   const areaMetrics = calculateDiscoveredArea(
     track,
     discoveryRadiusMeters / 1000
@@ -266,6 +379,8 @@ export function getTrackMetrics(track: Track) {
       maxSpeed: speedMetrics.maxSpeed,
       formattedAvgSpeed: speedMetrics.formattedAvgSpeed,
       formattedMaxSpeed: speedMetrics.formattedMaxSpeed,
+
+      // Original elevation metrics
       minAsml: asmlMetrics.minAsml,
       maxAsml: asmlMetrics.maxAsml,
       asmlGain: asmlMetrics.asmlGain,
@@ -274,6 +389,17 @@ export function getTrackMetrics(track: Track) {
       formattedMaxAsml: asmlMetrics.formattedMaxAsml,
       formattedAsmlGain: asmlMetrics.formattedAsmlGain,
       formattedAsmlLoss: asmlMetrics.formattedAsmlLoss,
+
+      // Smoothed elevation metrics
+      smoothedMinAsml: asmlMetrics.smoothedMinAsml,
+      smoothedMaxAsml: asmlMetrics.smoothedMaxAsml,
+      smoothedAsmlGain: asmlMetrics.smoothedAsmlGain,
+      smoothedAsmlLoss: asmlMetrics.smoothedAsmlLoss,
+      formattedSmoothedMinAsml: asmlMetrics.formattedSmoothedMinAsml,
+      formattedSmoothedMaxAsml: asmlMetrics.formattedSmoothedMaxAsml,
+      formattedSmoothedAsmlGain: asmlMetrics.formattedSmoothedAsmlGain,
+      formattedSmoothedAsmlLoss: asmlMetrics.formattedSmoothedAsmlLoss,
+
       discoveredArea: areaMetrics.discoveredArea,
       formattedDiscoveredArea: areaMetrics.formattedDiscoveredArea,
     };
@@ -291,6 +417,8 @@ export function getTrackMetrics(track: Track) {
     maxSpeed: speedMetrics.maxSpeed,
     formattedAvgSpeed: speedMetrics.formattedAvgSpeed,
     formattedMaxSpeed: speedMetrics.formattedMaxSpeed,
+
+    // Original elevation metrics
     minAsml: asmlMetrics.minAsml,
     maxAsml: asmlMetrics.maxAsml,
     asmlGain: asmlMetrics.asmlGain,
@@ -299,6 +427,17 @@ export function getTrackMetrics(track: Track) {
     formattedMaxAsml: asmlMetrics.formattedMaxAsml,
     formattedAsmlGain: asmlMetrics.formattedAsmlGain,
     formattedAsmlLoss: asmlMetrics.formattedAsmlLoss,
+
+    // Smoothed elevation metrics
+    smoothedMinAsml: asmlMetrics.smoothedMinAsml,
+    smoothedMaxAsml: asmlMetrics.smoothedMaxAsml,
+    smoothedAsmlGain: asmlMetrics.smoothedAsmlGain,
+    smoothedAsmlLoss: asmlMetrics.smoothedAsmlLoss,
+    formattedSmoothedMinAsml: asmlMetrics.formattedSmoothedMinAsml,
+    formattedSmoothedMaxAsml: asmlMetrics.formattedSmoothedMaxAsml,
+    formattedSmoothedAsmlGain: asmlMetrics.formattedSmoothedAsmlGain,
+    formattedSmoothedAsmlLoss: asmlMetrics.formattedSmoothedAsmlLoss,
+
     discoveredArea: areaMetrics.discoveredArea,
     formattedDiscoveredArea: areaMetrics.formattedDiscoveredArea,
   };

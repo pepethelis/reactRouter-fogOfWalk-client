@@ -75,19 +75,19 @@ export const SelectedTrackSheet = ({
                   },
                   {
                     label: "Min ASML",
-                    value: metrics.formattedMinAsml,
+                    value: metrics.formattedSmoothedMinAsml,
                   },
                   {
                     label: "Max ASML",
-                    value: metrics.formattedMaxAsml,
+                    value: metrics.formattedSmoothedMaxAsml,
                   },
                   {
                     label: "ASML gain",
-                    value: metrics.formattedAsmlGain,
+                    value: metrics.formattedSmoothedAsmlGain,
                   },
                   {
                     label: "ASML loss",
-                    value: metrics.formattedAsmlLoss,
+                    value: metrics.formattedSmoothedAsmlLoss,
                   },
                 ]}
               />

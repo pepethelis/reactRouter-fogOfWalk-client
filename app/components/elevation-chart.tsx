@@ -11,6 +11,7 @@ import type { Track } from "~/types";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
 import { cn } from "~/lib/utils";
 import { haversineDistance } from "~/utils/haversine-distance";
+import { savitzkyGolaySmooth } from "~/utils/smooth-elevation";
 
 type ElevationChartProps = {
   track: Track;
@@ -37,7 +38,8 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
       return [];
     }
 
-    const data = [];
+    // First, build the basic data with distances and elevations
+    const rawData = [];
     let cumulativeDistance = 0;
 
     for (let i = 0; i < track.points.length; i++) {
@@ -50,7 +52,7 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
       }
 
       if (point.asml !== undefined) {
-        data.push({
+        rawData.push({
           distance: cumulativeDistance,
           elevation: point.asml,
           index: i,
@@ -58,7 +60,21 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
       }
     }
 
-    return data;
+    if (rawData.length === 0) {
+      return [];
+    }
+
+    const elevations = rawData.map((d) => d.elevation);
+
+    let smoothedElevations: number[];
+
+    smoothedElevations = savitzkyGolaySmooth(elevations);
+
+    return rawData.map((point, i) => ({
+      ...point,
+      smoothedElevation: smoothedElevations[i],
+      originalElevation: point.elevation,
+    }));
   }, [track.points]);
 
   const chartConfig = {
