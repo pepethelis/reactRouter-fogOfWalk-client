@@ -4,7 +4,7 @@ import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
 import type { Track } from "~/types";
-import { parseActivityFiles } from "~/utils/unified-parser";
+import { parseActivityFiles } from "~/lib/utils/unified-parser";
 
 export function meta() {
   return [

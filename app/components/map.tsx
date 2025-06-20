@@ -6,11 +6,11 @@ import { Fog } from "./fog";
 import { ViewportTracker } from "./viewport-tracker";
 import { useTileManager } from "~/hooks/use-tile-manager";
 import { useTracksFitBounds } from "~/hooks/use-tracks-fit-bounds";
-import { calculateCenter } from "~/utils/calculate-center";
-import type { ViewportBounds } from "~/utils/tile-system";
+import { calculateCenter } from "~/lib/utils/calculate-center";
+import type { ViewportBounds } from "~/lib/utils/tile-system";
 import { OptimizedPolyline } from "./optimised-polyline";
-import { getDistanceFilteredTracks } from "~/utils/distance-track-filtering";
-import { deduplicateByTilesMap } from "~/utils/track-deduplication";
+import { getDistanceFilteredTracks } from "~/lib/utils/distance-track-filtering";
+import { deduplicateByTilesMap } from "~/lib/utils/track-deduplication";
 import type { Polyline as PolylineType } from "leaflet";
 import "leaflet/dist/leaflet.css";
 

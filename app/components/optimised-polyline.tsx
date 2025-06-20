@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Polyline } from "react-leaflet";
 import type { Track } from "~/types";
-import { stringToNumberHash } from "~/utils/string-to-number-hash";
+import { stringToNumberHash } from "~/lib/utils/string-to-number-hash";
 
 interface OptimizedPolylineProps {
   track: Track;
