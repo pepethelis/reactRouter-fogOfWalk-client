@@ -1,6 +1,6 @@
 import { useMap, useMapEvents } from "react-leaflet";
 import { useEffect } from "react";
-import type { ViewportBounds } from "~/lib/utils/tile-system";
+import type { ViewportBounds } from "~/lib/utils/map/tile-system";
 
 interface ViewportTrackerProps {
   onViewportChange: (bounds: ViewportBounds) => void;

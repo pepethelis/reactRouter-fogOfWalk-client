@@ -1,7 +1,7 @@
 import type { Track } from "~/types";
 import { parseFitFiles } from "./fit";
 import { parseGpxFiles } from "./gpx";
-import { generateLightId } from "./light-id";
+import { generateLightId } from "../helpers/light-id";
 
 export async function parseActivityFiles(
   files: FileList | File[]

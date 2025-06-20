@@ -1,5 +1,5 @@
 import type { Track } from "~/types";
-import { getTrackMetrics } from "~/lib/utils/calculate-track-metrics";
+import { getTrackMetrics } from "~/lib/utils/geo/calculations/calculate-track-metrics";
 import { Sheet, SheetContent, SheetTitle } from "./ui/sheet";
 import { StatsGrid } from "./stats-grid";
 import { ElevationChart } from "./elevation-chart";

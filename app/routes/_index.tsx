@@ -3,8 +3,8 @@ import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
+import { parseActivityFiles } from "~/lib/utils/parsers/unified-parser";
 import type { Track } from "~/types";
-import { parseActivityFiles } from "~/lib/utils/unified-parser";
 
 export function meta() {
   return [

@@ -4,7 +4,7 @@ import {
   TileSystem,
   type TileData,
   type ViewportBounds,
-} from "~/lib/utils/tile-system";
+} from "~/lib/utils/map/tile-system";
 
 export const useTileManager = (tracks: Track[]) => {
   const [tileCache] = useState(new Map<string, TileData>());

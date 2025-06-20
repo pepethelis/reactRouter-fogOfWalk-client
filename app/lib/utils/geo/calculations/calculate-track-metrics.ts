@@ -1,7 +1,7 @@
 import type { Track } from "~/types";
 import { calculateTrackLengthWithUnits } from "./calculate-track-length";
 import { discoveryRadiusMeters } from "~/lib/constants";
-import { removeOutliersAndSmooth } from "./smooth-elevation";
+import { removeOutliersAndSmooth } from "../processing/smooth-elevation";
 
 export function calculateTrackDuration(track: Track): number | null {
   const pointsWithTime = track.points.filter((point) => point.time);

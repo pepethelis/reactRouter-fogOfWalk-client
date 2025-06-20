@@ -9,9 +9,9 @@ import {
 } from "recharts";
 import type { Track } from "~/types";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
-import { cn } from "~/lib/utils/classnames";
-import { haversineDistance } from "~/lib/utils/haversine-distance";
-import { removeOutliersAndSmooth } from "~/lib/utils/smooth-elevation";
+import { cn } from "~/lib/utils/ui/classnames";
+import { haversineDistance } from "~/lib/utils/geo/calculations/haversine-distance";
+import { removeOutliersAndSmooth } from "~/lib/utils/geo/processing/smooth-elevation";
 
 type ElevationChartProps = {
   track: Track;

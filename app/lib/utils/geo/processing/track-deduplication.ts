@@ -1,5 +1,5 @@
 import type { Point, Track } from "~/types";
-import { generateLightId } from "./light-id";
+import { generateLightId } from "../../helpers/light-id";
 
 type TileValue = {
   point: Point;
