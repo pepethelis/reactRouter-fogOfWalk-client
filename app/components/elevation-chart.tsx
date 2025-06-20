@@ -11,7 +11,7 @@ import type { Track } from "~/types";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
 import { cn } from "~/lib/utils";
 import { haversineDistance } from "~/utils/haversine-distance";
-import { savitzkyGolaySmooth } from "~/utils/smooth-elevation";
+import { removeOutliersAndSmooth } from "~/utils/smooth-elevation";
 
 type ElevationChartProps = {
   track: Track;
@@ -68,7 +68,7 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
 
     let smoothedElevations: number[];
 
-    smoothedElevations = savitzkyGolaySmooth(elevations);
+    smoothedElevations = removeOutliersAndSmooth(elevations);
 
     return rawData.map((point, i) => ({
       ...point,
@@ -122,7 +122,7 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
         />
         <Line
           type="monotone"
-          dataKey="elevation"
+          dataKey="smoothedElevation"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
