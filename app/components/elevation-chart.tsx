@@ -114,6 +114,7 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
         <ChartTooltip
           content={
             <ChartTooltipContent
+              labelFormatter={() => "Elevation"}
               formatter={(value) =>
                 formatElevation(typeof value === "number" ? value : 0)
               }
