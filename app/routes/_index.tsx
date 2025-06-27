@@ -70,7 +70,7 @@ export default function Home() {
           selectedTrack={selectedTrack}
           onClose={() => setSelectedTrackId(null)}
         />
-        <main className="relative h-screen flex-grow flex">
+        <main className="relative h-screen flex-grow flex pointer-events-auto">
           <div className="z-0 w-full">
             <Map
               tracks={parsedTracks}
