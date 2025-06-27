@@ -76,6 +76,7 @@ export default function Home() {
               tracks={parsedTracks}
               selectedTrack={selectedTrack}
               onTrackClick={(track) => setSelectedTrackId(track.id || null)}
+              onMapClick={() => setSelectedTrackId(null)}
             />
           </div>
           {parsedTracks.length > 0 && (

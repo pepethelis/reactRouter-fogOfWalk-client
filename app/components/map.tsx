@@ -18,9 +18,10 @@ export type MapProps = {
   tracks: Array<Track>;
   selectedTrack: Track | null;
   onTrackClick?: (targetTrack: Track) => void;
+  onMapClick?: () => void;
 };
 
-const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
+const Map = ({ tracks, selectedTrack, onTrackClick, onMapClick }: MapProps) => {
   const [currentZoom, setCurrentZoom] = useState(13);
   const mapRef = useRef<MapType>(null);
   const selectedTrackPathRef = useRef<PolylineType>(null);
@@ -44,6 +45,25 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
     }
   }, [selectedTrack]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const handleMapClick = () => {
+      // Only trigger map click if no track was clicked
+      // stopPropagination didn't work, so I decided to leave it like this
+      if (!trackClickedRef.current) {
+        onMapClick?.();
+      }
+    };
+
+    map.on("click", handleMapClick);
+
+    return () => {
+      map.off("click", handleMapClick);
+    };
+  }, [onMapClick]);
+
   const { updateVisibleTiles, getVisiblePoints, visibleTileCount } =
     useTileManager(dedupedTracks);
 
@@ -53,6 +73,20 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
       setCurrentZoom(bounds.zoom);
     },
     [updateVisibleTiles]
+  );
+
+  const trackClickedRef = useRef(false);
+
+  const handleTrackClick = useCallback(
+    (track: Track) => {
+      trackClickedRef.current = true;
+      // Reset the flag after a short delay to allow map click to check it
+      setTimeout(() => {
+        trackClickedRef.current = false;
+      }, 0);
+      onTrackClick?.(track);
+    },
+    [onTrackClick]
   );
 
   const visiblePoints = getVisiblePoints(currentZoom);
@@ -84,7 +118,7 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
             muted={!!selectedTrack}
             track={track}
             visiblePointIndices={visiblePointIndices}
-            onClick={() => onTrackClick?.(track)}
+            onClick={() => handleTrackClick(track)}
           />
         );
       })}
@@ -101,6 +135,14 @@ const Map = ({ tracks, selectedTrack, onTrackClick }: MapProps) => {
             color: "red",
             weight: 3,
             opacity: 0.8,
+          }}
+          eventHandlers={{
+            click: () => {
+              trackClickedRef.current = true;
+              setTimeout(() => {
+                trackClickedRef.current = false;
+              }, 0);
+            },
           }}
         />
       )}

@@ -2,12 +2,13 @@ import React, { useMemo } from "react";
 import { Polyline } from "react-leaflet";
 import type { Track } from "~/types";
 import { stringToNumberHash } from "~/lib/utils/helpers/string-to-number-hash";
+import type { LeafletMouseEventHandlerFn } from "leaflet";
 
 interface OptimizedPolylineProps {
   track: Track;
   visiblePointIndices: Set<number>;
   muted?: boolean;
-  onClick?: () => void;
+  onClick?: LeafletMouseEventHandlerFn;
 }
 
 export const OptimizedPolyline: React.FC<OptimizedPolylineProps> = ({
