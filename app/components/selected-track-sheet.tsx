@@ -1,6 +1,6 @@
 import type { Track } from "~/types";
 import { getTrackMetrics } from "~/lib/utils/geo/calculations/calculate-track-metrics";
-import { Sheet, SheetContent, SheetTitle } from "./ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "./ui/sheet";
 import { StatsGrid } from "./stats-grid";
 import { ElevationChart } from "./elevation-chart";
 
@@ -31,7 +31,7 @@ export const SelectedTrackSheet = ({
               <SheetTitle className="text-base">
                 {selectedTrack.filename}
               </SheetTitle>
-              <p className="text-muted-foreground text-sm">
+              <SheetDescription className="text-muted-foreground text-sm">
                 {selectedTrack.time?.toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
@@ -44,7 +44,7 @@ export const SelectedTrackSheet = ({
                   minute: "2-digit",
                   hour12: false,
                 })}
-              </p>
+              </SheetDescription>
             </div>
             <div>
               <StatsGrid
