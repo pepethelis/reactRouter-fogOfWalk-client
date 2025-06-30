@@ -17,11 +17,18 @@ import "leaflet/dist/leaflet.css";
 export type MapProps = {
   tracks: Array<Track>;
   selectedTrack: Track | null;
+  fogOpacity?: number;
   onTrackClick?: (targetTrack: Track) => void;
   onMapClick?: () => void;
 };
 
-const Map = ({ tracks, selectedTrack, onTrackClick, onMapClick }: MapProps) => {
+const Map = ({
+  tracks,
+  selectedTrack,
+  fogOpacity,
+  onTrackClick,
+  onMapClick,
+}: MapProps) => {
   const [currentZoom, setCurrentZoom] = useState(13);
   const mapRef = useRef<MapType>(null);
   const selectedTrackPathRef = useRef<PolylineType>(null);
@@ -149,6 +156,7 @@ const Map = ({ tracks, selectedTrack, onTrackClick, onMapClick }: MapProps) => {
       )}
 
       <Fog
+        fogOpacity={fogOpacity}
         tracks={dedupedTracks}
         visiblePointsMap={visiblePoints}
         currentZoom={currentZoom}

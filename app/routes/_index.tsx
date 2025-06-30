@@ -3,6 +3,7 @@ import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
+import { Slider } from "~/components/ui/slider";
 import { parseActivityFiles } from "~/lib/utils/parsers/unified-parser";
 import type { Track } from "~/types";
 
@@ -15,6 +16,7 @@ export function meta() {
 
 export default function Home() {
   const [parsedTracks, setParsedTracks] = useState<Track[]>([]);
+  const [fogOpacity, setFogOpacity] = useState(0.7);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
@@ -75,12 +77,22 @@ export default function Home() {
             <Map
               tracks={parsedTracks}
               selectedTrack={selectedTrack}
+              fogOpacity={fogOpacity}
               onTrackClick={(track) => setSelectedTrackId(track.id || null)}
               onMapClick={() => setSelectedTrackId(null)}
             />
           </div>
           {parsedTracks.length > 0 && (
             <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
+              <div className="rounded bg-white/80 p-4 grid gap-2">
+                <span>Fog opacity</span>
+                <Slider
+                  defaultValue={[fogOpacity]}
+                  onValueCommit={([value]) => setFogOpacity(value)}
+                  max={1}
+                  step={0.01}
+                />
+              </div>
               <Button variant="secondary" onClick={handleSelectFilesClick}>
                 Add other tracks
               </Button>

@@ -11,12 +11,14 @@ interface FogOfWarProps {
   tracks: Array<Track>;
   visiblePointsMap: Map<number, Set<number>>;
   currentZoom: number;
+  fogOpacity?: number;
 }
 
 export const Fog = ({
   tracks,
   visiblePointsMap,
   currentZoom,
+  fogOpacity,
 }: FogOfWarProps) => {
   const map = useMap();
 
@@ -142,7 +144,7 @@ export const Fog = ({
         .attr("y", fogY)
         .attr("width", fogWidth)
         .attr("height", fogHeight)
-        .attr("fill", "rgba(0,0,0,0.8)")
+        .attr("fill", `rgba(0,0,0,${fogOpacity ?? 0.8})`)
         .attr("mask", "url(#fog-mask)");
     };
 
@@ -153,7 +155,7 @@ export const Fog = ({
       map.off("zoomend moveend", renderFog);
       svg.remove();
     };
-  }, [map, tracks, visiblePointsMap, currentZoom]);
+  }, [map, tracks, visiblePointsMap, currentZoom, fogOpacity]);
 
   return <Pane name="fogPane" />;
 };
