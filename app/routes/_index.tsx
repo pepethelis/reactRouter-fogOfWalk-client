@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import Map from "~/components/map";
+import Map, { mapStyles, type MapStyle } from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
@@ -30,6 +30,7 @@ export function meta() {
 export default function Home() {
   const [parsedTracks, setParsedTracks] = useState<Track[]>([]);
   const [fogOpacity, setFogOpacity] = useState(0.7);
+  const [mapStyle, setMapStyle] = useState<MapStyle>("default");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
@@ -88,6 +89,7 @@ export default function Home() {
         <main className="relative h-screen flex-grow flex pointer-events-auto">
           <div className="z-0 w-full">
             <Map
+              style={mapStyle}
               tracks={parsedTracks}
               selectedTrack={selectedTrack}
               fogOpacity={fogOpacity}
@@ -123,6 +125,21 @@ export default function Home() {
                       <MenubarRadioItem value="0.5">50%</MenubarRadioItem>
                       <MenubarRadioItem value="0.7">70%</MenubarRadioItem>
                       <MenubarRadioItem value="0.8">80%</MenubarRadioItem>
+                    </MenubarRadioGroup>
+                  </MenubarSubContent>
+                </MenubarSub>
+                <MenubarSub>
+                  <MenubarSubTrigger>Map style</MenubarSubTrigger>
+                  <MenubarSubContent>
+                    <MenubarRadioGroup
+                      value={mapStyle}
+                      onValueChange={(value) => setMapStyle(value as MapStyle)}
+                    >
+                      {mapStyles.map((style) => (
+                        <MenubarRadioItem key={style} value={style}>
+                          {style}
+                        </MenubarRadioItem>
+                      ))}
                     </MenubarRadioGroup>
                   </MenubarSubContent>
                 </MenubarSub>

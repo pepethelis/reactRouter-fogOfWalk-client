@@ -18,14 +18,28 @@ export type MapProps = {
   tracks: Array<Track>;
   selectedTrack: Track | null;
   fogOpacity?: number;
+  style?: MapStyle;
   onTrackClick?: (targetTrack: Track) => void;
   onMapClick?: () => void;
+};
+
+export const mapStyles = ["satelite", "light", "default"] as const;
+
+export type MapStyle = (typeof mapStyles)[number];
+
+const mapUrls: Record<MapStyle, string> = {
+  default:
+    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+  satelite:
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
 };
 
 const Map = ({
   tracks,
   selectedTrack,
   fogOpacity,
+  style = "default",
   onTrackClick,
   onMapClick,
 }: MapProps) => {
@@ -109,7 +123,7 @@ const Map = ({
     >
       <TileLayer
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        url={mapUrls[style]}
       />
 
       <ViewportTracker onViewportChange={handleViewportChange} />
