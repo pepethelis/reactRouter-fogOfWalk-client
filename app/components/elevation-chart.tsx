@@ -1,14 +1,12 @@
 import React from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import type { Track } from "~/types";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "./ui/chart";
 import { cn } from "~/lib/utils/ui/classnames";
 import { haversineDistance } from "~/lib/utils/geo/calculations/haversine-distance";
 import { removeOutliersAndSmooth } from "~/lib/utils/geo/processing/smooth-elevation";
@@ -38,7 +36,6 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
       return [];
     }
 
-    // First, build the basic data with distances and elevations
     const rawData = [];
     let cumulativeDistance = 0;
 
@@ -77,7 +74,19 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
     }));
   }, [track.points]);
 
-  const chartConfig = {
+  const yAxisDomain = React.useMemo(() => {
+    if (chartData.length === 0) {
+      return undefined;
+    }
+
+    const elevations = chartData.map((d) => d.smoothedElevation);
+    const minElevation = Math.min(...elevations);
+    const maxElevation = Math.max(...elevations);
+
+    return [minElevation - 100, maxElevation + 100];
+  }, [chartData]);
+
+  const chartConfig: ChartConfig = {
     elevation: {
       label: "Elevation",
       color: "hsl(var(--chart-1))",
@@ -110,7 +119,7 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="distance" tickFormatter={formatDistance} />
-        <YAxis tickFormatter={formatElevation} />
+        <YAxis tickFormatter={formatElevation} domain={yAxisDomain} />
         <ChartTooltip
           content={
             <ChartTooltipContent
