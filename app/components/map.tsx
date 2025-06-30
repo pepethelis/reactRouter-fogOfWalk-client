@@ -40,10 +40,11 @@ const Map = ({ tracks, selectedTrack, onTrackClick, onMapClick }: MapProps) => {
   const position = useMemo(() => calculateCenter(tracks), [tracks]);
 
   useEffect(() => {
-    if (selectedTrackPathRef.current) {
-      selectedTrackPathRef.current.bringToFront();
+    const path = selectedTrackPathRef.current;
+    if (path) {
+      setTimeout(() => path.bringToFront(), 0);
     }
-  }, [selectedTrack]);
+  }, [selectedTrack, currentZoom]);
 
   useEffect(() => {
     const map = mapRef.current;
