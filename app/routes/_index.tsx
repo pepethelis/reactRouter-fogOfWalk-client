@@ -1,22 +1,8 @@
 import { useMemo, useRef, useState } from "react";
+import { MainMenubar } from "~/components/main-menubar";
 import Map, { mapStyles, type MapStyle } from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
-import { Button } from "~/components/ui/button";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
-  MenubarSeparator,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  MenubarTrigger,
-} from "~/components/ui/menubar";
-import { Slider } from "~/components/ui/slider";
 import { parseActivityFiles } from "~/lib/utils/parsers/unified-parser";
 import type { Track } from "~/types";
 
@@ -97,55 +83,14 @@ export default function Home() {
               onMapClick={() => setSelectedTrackId(null)}
             />
           </div>
-          <Menubar className="absolute top-4 left-4 z-10">
-            <MenubarMenu>
-              <MenubarTrigger>File</MenubarTrigger>
-              <MenubarContent>
-                <MenubarItem onClick={handleSelectFilesClick}>
-                  Add other tracks
-                </MenubarItem>
-                <MenubarItem onClick={handleClearTracksClick}>
-                  Clear tracks
-                </MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger>View</MenubarTrigger>
-              <MenubarContent>
-                <MenubarSub>
-                  <MenubarSubTrigger>Fog opacity</MenubarSubTrigger>
-                  <MenubarSubContent>
-                    <MenubarRadioGroup
-                      value={fogOpacity.toString()}
-                      onValueChange={(value) =>
-                        setFogOpacity(parseFloat(value))
-                      }
-                    >
-                      <MenubarRadioItem value="0">Hidden</MenubarRadioItem>
-                      <MenubarRadioItem value="0.5">50%</MenubarRadioItem>
-                      <MenubarRadioItem value="0.7">70%</MenubarRadioItem>
-                      <MenubarRadioItem value="0.8">80%</MenubarRadioItem>
-                    </MenubarRadioGroup>
-                  </MenubarSubContent>
-                </MenubarSub>
-                <MenubarSub>
-                  <MenubarSubTrigger>Map style</MenubarSubTrigger>
-                  <MenubarSubContent>
-                    <MenubarRadioGroup
-                      value={mapStyle}
-                      onValueChange={(value) => setMapStyle(value as MapStyle)}
-                    >
-                      {mapStyles.map((style) => (
-                        <MenubarRadioItem key={style} value={style}>
-                          {style}
-                        </MenubarRadioItem>
-                      ))}
-                    </MenubarRadioGroup>
-                  </MenubarSubContent>
-                </MenubarSub>
-              </MenubarContent>
-            </MenubarMenu>
-          </Menubar>
+          <MainMenubar
+            fogOpacity={fogOpacity}
+            mapStyle={mapStyle}
+            setFogOpacity={setFogOpacity}
+            setMapStyle={setMapStyle}
+            onSelectFilesClick={handleSelectFilesClick}
+            onClearTracksClick={handleClearTracksClick}
+          />
         </main>
       </div>
     </>
