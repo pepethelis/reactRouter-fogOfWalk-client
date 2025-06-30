@@ -3,6 +3,19 @@ import Map from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { Button } from "~/components/ui/button";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarSeparator,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from "~/components/ui/menubar";
 import { Slider } from "~/components/ui/slider";
 import { parseActivityFiles } from "~/lib/utils/parsers/unified-parser";
 import type { Track } from "~/types";
@@ -82,25 +95,40 @@ export default function Home() {
               onMapClick={() => setSelectedTrackId(null)}
             />
           </div>
-          {parsedTracks.length > 0 && (
-            <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4">
-              <div className="rounded bg-white/80 p-4 grid gap-2">
-                <span>Fog opacity</span>
-                <Slider
-                  defaultValue={[fogOpacity]}
-                  onValueCommit={([value]) => setFogOpacity(value)}
-                  max={1}
-                  step={0.01}
-                />
-              </div>
-              <Button variant="secondary" onClick={handleSelectFilesClick}>
-                Add other tracks
-              </Button>
-              <Button variant="secondary" onClick={handleClearTracksClick}>
-                Clear tracks
-              </Button>
-            </div>
-          )}
+          <Menubar className="absolute top-4 left-4 z-10">
+            <MenubarMenu>
+              <MenubarTrigger>File</MenubarTrigger>
+              <MenubarContent>
+                <MenubarItem onClick={handleSelectFilesClick}>
+                  Add other tracks
+                </MenubarItem>
+                <MenubarItem onClick={handleClearTracksClick}>
+                  Clear tracks
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger>View</MenubarTrigger>
+              <MenubarContent>
+                <MenubarSub>
+                  <MenubarSubTrigger>Fog opacity</MenubarSubTrigger>
+                  <MenubarSubContent>
+                    <MenubarRadioGroup
+                      value={fogOpacity.toString()}
+                      onValueChange={(value) =>
+                        setFogOpacity(parseFloat(value))
+                      }
+                    >
+                      <MenubarRadioItem value="0">Hidden</MenubarRadioItem>
+                      <MenubarRadioItem value="0.5">50%</MenubarRadioItem>
+                      <MenubarRadioItem value="0.7">70%</MenubarRadioItem>
+                      <MenubarRadioItem value="0.8">80%</MenubarRadioItem>
+                    </MenubarRadioGroup>
+                  </MenubarSubContent>
+                </MenubarSub>
+              </MenubarContent>
+            </MenubarMenu>
+          </Menubar>
         </main>
       </div>
     </>
