@@ -38,7 +38,8 @@ const calculateSpeed = (point1: Point, point2: Point): number => {
   const time2 = new Date(point2.time).getTime();
   const timeDiff = Math.abs(time2 - time1) / 1000; // seconds
 
-  if (timeDiff === 0) {
+  if (timeDiff === 0 || timeDiff < 0.1) {
+    // Ignore very small time differences
     return 0;
   }
 
@@ -46,6 +47,36 @@ const calculateSpeed = (point1: Point, point2: Point): number => {
   const speedKmh = speedMps * 3.6; // km/h
 
   return speedKmh;
+};
+
+const removeSpeedOutliers = (speeds: number[]): number[] => {
+  if (speeds.length < 3) return speeds;
+
+  // Calculate median and MAD (Median Absolute Deviation)
+  const sortedSpeeds = [...speeds].sort((a, b) => a - b);
+  const median = sortedSpeeds[Math.floor(sortedSpeeds.length / 2)];
+
+  const deviations = speeds.map((speed) => Math.abs(speed - median));
+  const sortedDeviations = [...deviations].sort((a, b) => a - b);
+  const mad = sortedDeviations[Math.floor(sortedDeviations.length / 2)];
+
+  // Use MAD-based outlier detection (more robust than standard deviation)
+  const threshold = 3 * mad;
+
+  return speeds.map((speed, index) => {
+    if (deviations[index] > threshold) {
+      // Replace outlier with median of nearby values
+      const start = Math.max(0, index - 2);
+      const end = Math.min(speeds.length - 1, index + 2);
+      const nearbyValues = speeds
+        .slice(start, end + 1)
+        .filter((_, i) => i + start !== index);
+      return nearbyValues.length > 0
+        ? nearbyValues.reduce((a, b) => a + b) / nearbyValues.length
+        : median;
+    }
+    return speed;
+  });
 };
 
 export const SpeedChart: React.FC<SpeedChartProps> = ({ track, className }) => {
@@ -66,9 +97,8 @@ export const SpeedChart: React.FC<SpeedChartProps> = ({ track, className }) => {
 
       const speed = calculateSpeed(prevPoint, currentPoint);
 
-      // Only include points with valid speed data
-      if (speed > 0 && speed < 200) {
-        // Filter out unrealistic speeds (> 200 km/h)
+      // Only include points with valid speed data (basic filtering for zero/negative speeds)
+      if (speed > 0) {
         rawData.push({
           distance: cumulativeDistance,
           speed: speed,
@@ -82,13 +112,26 @@ export const SpeedChart: React.FC<SpeedChartProps> = ({ track, className }) => {
     }
 
     const speeds = rawData.map((d) => d.speed);
-    let smoothedSpeeds: number[];
 
+    // First remove statistical outliers
+    const cleanedSpeeds = removeSpeedOutliers(speeds);
+
+    // Then apply smoothing
+    let smoothedSpeeds: number[];
     try {
-      smoothedSpeeds = removeOutliersAndSmooth(speeds);
+      smoothedSpeeds = removeOutliersAndSmooth(cleanedSpeeds);
     } catch {
-      // Fallback if smoothing fails
-      smoothedSpeeds = speeds;
+      // Fallback if smoothing fails - apply simple moving average
+      smoothedSpeeds = cleanedSpeeds.map((speed, i) => {
+        const windowSize = 3;
+        const start = Math.max(0, i - Math.floor(windowSize / 2));
+        const end = Math.min(
+          cleanedSpeeds.length - 1,
+          i + Math.floor(windowSize / 2)
+        );
+        const window = cleanedSpeeds.slice(start, end + 1);
+        return window.reduce((sum, val) => sum + val, 0) / window.length;
+      });
     }
 
     return rawData.map((point, i) => ({
