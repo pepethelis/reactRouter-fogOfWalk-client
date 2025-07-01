@@ -1,6 +1,7 @@
 import type { Track } from "~/types";
 import { parseFitFiles } from "./fit";
 import { parseGpxFiles } from "./gpx";
+import { parseKmlFiles } from "./kml";
 import { generateLightId } from "../helpers/light-id";
 
 export async function parseActivityFiles(
@@ -8,12 +9,17 @@ export async function parseActivityFiles(
 ): Promise<Track[]> {
   const fitFiles: File[] = [];
   const gpxFiles: File[] = [];
+  const kmlFiles: File[] = [];
 
   for (const file of files) {
     if (file.name.toLowerCase().endsWith(".fit")) {
       fitFiles.push(file);
     } else if (file.name.toLowerCase().endsWith(".gpx")) {
       gpxFiles.push(file);
+    } else if (file.name.toLowerCase().endsWith(".kml")) {
+      kmlFiles.push(file);
+    } else {
+      console.warn(`Unsupported file type: ${file.name}`);
     }
   }
 
@@ -36,6 +42,16 @@ export async function parseActivityFiles(
       tracks.push(...gpxTracks);
     } catch (error) {
       console.error("Error parsing GPX files:", error);
+    }
+  }
+
+  // Parse KML files
+  if (kmlFiles.length > 0) {
+    try {
+      const kmlTracks = await parseKmlFiles(kmlFiles);
+      tracks.push(...kmlTracks);
+    } catch (error) {
+      console.error("Error parsing KML files:", error);
     }
   }
 
