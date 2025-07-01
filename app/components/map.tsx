@@ -174,6 +174,8 @@ const Map = ({
         tracks={dedupedTracks}
         visiblePointsMap={visiblePoints}
         currentZoom={currentZoom}
+        tileUrl={mapUrls[style]}
+        mapStyle={style}
       />
 
       <div
