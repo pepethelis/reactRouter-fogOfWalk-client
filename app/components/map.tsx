@@ -23,12 +23,12 @@ export type MapProps = {
   onMapClick?: () => void;
 };
 
-export const mapStyles = ["satelite", "light", "default"] as const;
+export const mapStyles = ["satelite", "light", "color"] as const;
 
 export type MapStyle = (typeof mapStyles)[number];
 
 const mapUrls: Record<MapStyle, string> = {
-  default:
+  color:
     "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
   satelite:
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -39,7 +39,7 @@ const Map = ({
   tracks,
   selectedTrack,
   fogOpacity,
-  style = "default",
+  style = "light",
   onTrackClick,
   onMapClick,
 }: MapProps) => {

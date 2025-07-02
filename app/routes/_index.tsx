@@ -15,8 +15,8 @@ export function meta() {
 
 export default function Home() {
   const [parsedTracks, setParsedTracks] = useState<Track[]>([]);
-  const [fogOpacity, setFogOpacity] = useState(0.7);
-  const [mapStyle, setMapStyle] = useState<MapStyle>("default");
+  const [fogOpacity, setFogOpacity] = useState(0.5);
+  const [mapStyle, setMapStyle] = useState<MapStyle>("light");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
