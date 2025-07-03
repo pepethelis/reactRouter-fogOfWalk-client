@@ -14,6 +14,7 @@ interface FogOfWarProps {
   fogOpacity?: number;
   tileUrl: string;
   mapStyle?: string;
+  fogStyle?: string;
 }
 
 export const Fog = ({
@@ -23,12 +24,14 @@ export const Fog = ({
   fogOpacity,
   tileUrl,
   mapStyle,
+  fogStyle = "inverted",
 }: FogOfWarProps) => {
   const map = useMap();
   const invertedLayerRef = useRef<L.TileLayer | null>(null);
 
   useEffect(() => {
-    if (mapStyle === "satelite") {
+    console.log('Fog effect initialized with style:', fogStyle);
+    if (mapStyle === "satelite" || fogStyle !== "inverted") {
       // If the map style is satelite, we don't need the inverted layer
       return;
     }
@@ -56,7 +59,7 @@ export const Fog = ({
         map.getPane("invertedPane")!.remove();
       }
     };
-  }, [map, tileUrl, mapStyle]);
+  }, [map, tileUrl, mapStyle, fogStyle]);
 
   useEffect(() => {
     const svg = L.svg({ pane: "fogPane", padding: buffer }).addTo(map);
@@ -191,7 +194,7 @@ export const Fog = ({
       map.off("zoomend moveend", renderFog);
       svg.remove();
     };
-  }, [map, tracks, visiblePointsMap, currentZoom, fogOpacity]);
+  }, [map, tracks, visiblePointsMap, currentZoom, fogOpacity, fogStyle]);
 
   return <Pane name="fogPane" />;
 };
