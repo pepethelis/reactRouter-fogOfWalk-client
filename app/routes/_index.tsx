@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { MainMenubar } from "~/components/main-menubar";
-import Map, { mapStyles, type MapStyle } from "~/components/map";
+import Map, { type FogStyle, type MapStyle } from "~/components/map";
 import { SelectFilesDialog } from "~/components/select-files-dialog";
 import { SelectedTrackSheet } from "~/components/selected-track-sheet";
 import { parseActivityFiles } from "~/lib/utils/parsers/unified-parser";
@@ -15,8 +15,9 @@ export function meta() {
 
 export default function Home() {
   const [parsedTracks, setParsedTracks] = useState<Track[]>([]);
-  const [fogOpacity, setFogOpacity] = useState(0.7);
-  const [mapStyle, setMapStyle] = useState<MapStyle>("default");
+  const [fogOpacity, setFogOpacity] = useState(0.5);
+  const [mapStyle, setMapStyle] = useState<MapStyle>("light");
+  const [fogStyle, setFogStyle] = useState<FogStyle>("inverted");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export default function Home() {
 
       <SelectFilesDialog
         isOpen={parsedTracks.length === 0}
-        onSelectFilesCLick={handleSelectFilesClick}
+        onSelectFilesClick={handleSelectFilesClick}
       />
 
       <div className="relative flex w-full">
@@ -79,6 +80,7 @@ export default function Home() {
               tracks={parsedTracks}
               selectedTrack={selectedTrack}
               fogOpacity={fogOpacity}
+              fogStyle={fogStyle}
               onTrackClick={(track) => setSelectedTrackId(track.id || null)}
               onMapClick={() => setSelectedTrackId(null)}
             />
@@ -86,8 +88,10 @@ export default function Home() {
           <MainMenubar
             fogOpacity={fogOpacity}
             mapStyle={mapStyle}
+            fogStyle={fogStyle}
             setFogOpacity={setFogOpacity}
             setMapStyle={setMapStyle}
+            setFogStyle={setFogStyle}
             onSelectFilesClick={handleSelectFilesClick}
             onClearTracksClick={handleClearTracksClick}
           />
