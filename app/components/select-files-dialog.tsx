@@ -9,12 +9,12 @@ import { Button } from "./ui/button";
 
 type SelectFilesDialogProps = {
   isOpen: boolean;
-  onSelectFilesCLick: () => void;
+  onSelectFilesClick: () => void;
 };
 
 export function SelectFilesDialog({
   isOpen,
-  onSelectFilesCLick,
+  onSelectFilesClick: onSelectFilesCLick,
 }: SelectFilesDialogProps) {
   return (
     <Dialog open={isOpen}>

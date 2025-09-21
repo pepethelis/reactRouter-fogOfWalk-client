@@ -4,8 +4,11 @@ import type { Map as MapType } from "leaflet";
 import type { Track } from "~/types";
 import { Fog } from "./fog";
 import { ViewportTracker } from "./viewport-tracker";
+import LocationMarker from "./location-marker";
+import LocationControl from "./location-control";
 import { useTileManager } from "~/hooks/use-tile-manager";
 import { useTracksFitBounds } from "~/hooks/use-tracks-fit-bounds";
+import { useGeolocation } from "~/hooks/use-geolocation";
 import { calculateCenter } from "~/lib/utils/geo/calculations/calculate-center";
 import type { ViewportBounds } from "~/lib/utils/map/tile-system";
 import { OptimizedPolyline } from "./optimised-polyline";
@@ -19,16 +22,22 @@ export type MapProps = {
   selectedTrack: Track | null;
   fogOpacity?: number;
   style?: MapStyle;
+  fogStyle?: FogStyle;
+  showUserLocation?: boolean;
   onTrackClick?: (targetTrack: Track) => void;
   onMapClick?: () => void;
 };
 
-export const mapStyles = ["satelite", "light", "default"] as const;
+export const mapStyles = ["satelite", "light", "color"] as const;
 
 export type MapStyle = (typeof mapStyles)[number];
 
+export const fogStyles = ["classic", "inverted"] as const;
+
+export type FogStyle = (typeof fogStyles)[number];
+
 const mapUrls: Record<MapStyle, string> = {
-  default:
+  color:
     "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
   satelite:
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -39,13 +48,26 @@ const Map = ({
   tracks,
   selectedTrack,
   fogOpacity,
-  style = "default",
+  style = "light",
+  fogStyle = "inverted",
+  showUserLocation = true,
   onTrackClick,
   onMapClick,
 }: MapProps) => {
   const [currentZoom, setCurrentZoom] = useState(13);
   const mapRef = useRef<MapType>(null);
   const selectedTrackPathRef = useRef<PolylineType>(null);
+
+  const {
+    position: userPosition,
+    isLoading: isLocationLoading,
+    error: locationError,
+  } = useGeolocation({
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 300000, // 5 minutes
+    watch: true,
+  });
 
   useTracksFitBounds(tracks, mapRef.current);
 
@@ -69,7 +91,9 @@ const Map = ({
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map) {
+      return;
+    }
 
     const handleMapClick = () => {
       // Only trigger map click if no track was clicked
@@ -174,7 +198,19 @@ const Map = ({
         tracks={dedupedTracks}
         visiblePointsMap={visiblePoints}
         currentZoom={currentZoom}
+        tileUrl={mapUrls[style]}
+        mapStyle={style}
+        fogStyle={fogStyle}
       />
+
+      {showUserLocation && userPosition && (
+        <LocationMarker
+          position={userPosition}
+          showAccuracy={currentZoom >= 15}
+        />
+      )}
+
+      {!locationError && <LocationControl map={mapRef.current} />}
 
       <div
         style={{
@@ -202,6 +238,13 @@ const Map = ({
           (total, set) => total + set.size,
           0
         )}
+        <br />
+        Location:{" "}
+        {isLocationLoading
+          ? "Loading..."
+          : userPosition
+          ? "Available"
+          : "Unavailable"}
       </div>
     </MapContainer>
   );
