@@ -57,7 +57,7 @@ export default function Home() {
       <input
         multiple
         type="file"
-        accept=".fit,.gpx,.kml,application/gpx+xml,application/octet-stream,application/vnd.google-earth.kml+xml"
+        accept=".fit,.gpx,.kml,.kmz,application/gpx+xml,application/octet-stream,application/vnd.google-earth.kml+xml"
         ref={fileInputRef}
         onChange={handleFileChange}
         className="hidden"

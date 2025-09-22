@@ -27,6 +27,7 @@
     "d3": "^7.9.0",
     "fast-xml-parser": "^5.2.5",
     "isbot": "^5.1.27",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.518.0",
     "react": "^19.1.0",

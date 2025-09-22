@@ -20,7 +20,7 @@ export function SelectFilesDialog({
     <Dialog open={isOpen}>
       <DialogContent className="z-50" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Please select your .fit, .kml or .gpx files</DialogTitle>
+          <DialogTitle>Please select your .fit, .kml(.kmz) or .gpx files</DialogTitle>
           <DialogDescription>
             Some useless description which won't be read by anyone. It is needed
             just to make the app appear more complex than it actually is.
